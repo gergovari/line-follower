@@ -10,7 +10,7 @@ struct LedPinmux {
 struct LedCalibration {
 	unsigned int low;
 	unsigned int high;
-}
+};
 
 enum class Led {
 	FIRST = 0, 
