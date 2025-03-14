@@ -1,102 +1,193 @@
 #include <Arduino.h>
 
-struct LedPinmux {
-	unsigned int first[2];
-	unsigned int second[2];
-	unsigned int third[2];
-	unsigned int fourth[2];
-};
+typedef unsigned int uint;
+typedef uint Pin;
 
-struct LedCalibration {
-	unsigned int low;
-	unsigned int high;
-};
-
-enum class Led {
-	FIRST = 0, 
-	SECOND = 1, 
-	THIRD = 2, 
-	FOURTH = 3
-};
-
-class LedDriver {
-	public:
-		unsigned int pins[8];
-		struct LedCalibration calibration;
-
-		LedDriver(struct LedPinmux pinmux, struct LedCalibration c);
-		void setState(Led led, bool state);
-		bool getState(Led led);
-
+class Led {
 	private:
-		unsigned int readVal(Led led);
+		Pin pin;
+	public:
+		Led(Pin p);
+		void set(bool state);
 };
 
-LedDriver::LedDriver(struct LedPinmux pinmux, struct LedCalibration c) {
-		pins[4] = {
-			pinmux.first[0], 
-			pinmux.second[0],
-			pinmux.third[0], 
-			pinmux.fourth[0],
+Led::Led(Pin p) {
+	pin = p;
 
-			pinmux.first[1], 
-			pinmux.second[1],
-			pinmux.third[1], 
-			pinmux.fourth[1]
-		};
-		calibration = c;
-
-		for (const auto pin : pins) {
-			pinMode(pin, OUTPUT);
-		}
+	pinMode(pin, OUTPUT);
+	set(true);
 }
 
-void LedDriver::setState(Led led, bool state) {
-	digitalWrite(pins[led], state);
+void Led::set(bool state) {
+	digitalWrite(pin, state);
 }
 
-bool LedDriver::getState(Led led) {
-	unsigned int val = readVal(led);
 
-	if (val >= calibration.high) {
-		return true;
-	} else if (val =< calibration.low) {
-		return false;
-	} else {
-		// TODO: what to do?
-		return false;
-	}
-}
-
-unsigned int LedDriver::readVal(Led led) {
-	return analogRead(pins[4 + led]);
-}
-
-class LedController {
-
+class Sensor {
+	private:
+		Pin pin;
+	public:
+		Sensor(Pin p);
+		uint get();
 };
 
-LedDriver led(
-	LedPinmux{
-		{ 8, A0 },
-		{ 9, A1 },
-		{ 10, A2 },
-		{ 11, A3 }
-	}, 
+Sensor::Sensor(Pin p) {
+	pin = p;
+
+	pinMode(pin, INPUT);
+}
+
+uint Sensor::get() {
+	return analogRead(pin);
+}
+
+typedef void(*SensorManagerCallback)(uint*, uint) ;
+
+class SensorManager {
+	private:
+		SensorManagerCallback callback;
+		uint size;
+		Sensor **sensors;
+
+	public:
+		SensorManager(Sensor **se, uint si);
+
+		void setCallback(SensorManagerCallback cb);
+		void tick();
+};
+
+SensorManager::SensorManager(Sensor **se, uint si) {
+	sensors = se;
+	size = si;
+}
+
+void SensorManager::setCallback(SensorManagerCallback cb) {
+	callback = cb;
+}
+
+void SensorManager::tick() {
+	uint *values = malloc(size * sizeof(uint));
 	
-	// TODO: calibration
-	LedCalibration{
-		30,
-		240
+	for (int i = 0; i < size; i++) {
+		values[i] = sensors[i]->get();
 	}
-);
+
+	callback(values, size);
+	free(values);
+}
+
+#define LED_SIZE 4
+
+#define LED1 8
+#define LED2 9
+#define LED3 10
+#define LED4 11
+
+#define SENSOR_SIZE 4
+
+#define SENSOR1 A0
+#define SENSOR2 A1
+#define SENSOR3 A2
+#define SENSOR4 A3
+
+#define SENSOR_WEIGHT_UNIT 10
+#define SENSOR1_WEIGHT -1
+#define SENSOR2_WEIGHT -2
+#define SENSOR3_WEIGHT 2
+#define SENSOR4_WEIGHT 1
+
+Led led1(LED1);
+Led led2(LED2);
+Led led3(LED3);
+Led led4(LED4);
+
+Sensor sensor1(SENSOR1);
+Sensor sensor2(SENSOR2);
+Sensor sensor3(SENSOR3);
+Sensor sensor4(SENSOR4);
+
+Sensor *sensors[SENSOR_SIZE] = { &sensor1, &sensor2, &sensor3, &sensor4 };
+SensorManager sensorManager((Sensor**)&sensors, SENSOR_SIZE);
+
+void arraySum(uint *arr, uint size, long *result) {
+	for (int i = 0; i < size; i++) {
+		(*result) += arr[i];
+	}
+}
+
+void weightedArraySum(uint *arr, uint* weights, uint size, long *result) {
+	for (int i = 0; i < size; i++) {
+		(*result) += arr[i] * weights[i];
+	}
+}
+
+void weightedAverage(uint *values, uint *weights, uint size, long *result) {
+	long valueSum = 0; 
+	long weightedSum = 0; 
+	
+	arraySum(values, size, &valueSum);
+	weightedArraySum(values, weights, size, &weightedSum);
+
+	(*result) = weightedSum / valueSum;
+}
+
+uint sensorWeights[SENSOR_SIZE] = {
+	SENSOR1_WEIGHT * SENSOR_WEIGHT_UNIT,
+	SENSOR2_WEIGHT * SENSOR_WEIGHT_UNIT,
+	SENSOR3_WEIGHT * SENSOR_WEIGHT_UNIT,
+	SENSOR4_WEIGHT * SENSOR_WEIGHT_UNIT,
+};
+
+void sensorCb(uint *values, uint size) {
+	
+	long error;
+
+	weightedAverage(values, sensorWeights, size, &error);
+	Serial.println(error);
+}
 
 void setup()
 {
 	Serial.begin(9600);
+	
+	sensorManager.setCallback(&sensorCb);
 }
+
+#define DEMO 0
+#if demo
+void test_leds() {
+	delay(500);
+	led1.set(false);
+	delay(2000);
+
+	led2.set(false);
+	delay(2000);
+
+	led3.set(false);
+	delay(2000);
+
+	led4.set(false);
+	delay(2000);
+
+	led1.set(true);
+	delay(500);
+
+	led2.set(true);
+	delay(500);
+
+	led3.set(true);
+	delay(500);
+
+	led4.set(true);
+	delay(500);
+}
+#endif /* DEMO */
 
 void loop()
 {
-
+#if DEMO
+	test_leds();
+#else
+	sensorManager.tick();
+#endif /* DEMO */
 }
