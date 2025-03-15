@@ -1,0 +1,1 @@
+./run.sh && ./mon.sh 
