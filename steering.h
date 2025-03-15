@@ -3,6 +3,7 @@
 #include "common.h"
 #include "motor.h"
 
+/* Absztrakció a kormányzásra, a motorokat kezeli hogy az adott irányba menjünk. */
 class Steering {
 	private:
 		Motor *left;

@@ -5,6 +5,8 @@
 
 typedef void(*SensorManagerCallback)(uint*, uint) ;
 
+/* Lehetővé teszi hogy egyszerűen megkapjuk a szenzorok értékeit, 
+ * bármilyen frissitési megoldást is használunk. (Jelenleg polling) */
 class SensorManager {
 	private:
 		SensorManagerCallback callback;

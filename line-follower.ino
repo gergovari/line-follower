@@ -16,7 +16,7 @@
 /* Ha a DEMO-t 1-re rakjuk akkor nem az alap program fog lefutni 
  * hanem a hardver fog mindent bemutatni amit tud. 
  * Érdemes nem lerakni a földre ilyenkor a robotot. */
-#define DEMO 0
+#define DEMO 1
 #if DEMO
 #include "demo.h"
 #endif /* DEMO */
@@ -73,11 +73,12 @@ Motor leftMotor(LFORW, LBACK, LSPEED);
 Motor rightMotor(RFORW, RBACK, RSPEED);
 Steering steering(&leftMotor, &rightMotor);
 
-/* TODO: finetune */
+/* TODO: finetune, might be too violent of a spin */
 void startSpinSequence() {
 	steering.setTarget(-1000);
 }
 
+/* TODO; counteract spin? idk how this will behave. */
 void stopSpinSequence() {
 
 	steering.stop();

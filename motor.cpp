@@ -11,6 +11,7 @@ Motor::Motor(Pin f, Pin b, Pin s) {
 	pinMode(backward, OUTPUT);
 	pinMode(speed, OUTPUT);
 
+	/* Kezdjünk fékezve. */
 	setSpeed(0);
 }
 
@@ -39,7 +40,8 @@ void Motor::setDirection(Direction dir) {
 
 void Motor::setSpeed(signed int s) {
 	s = constrain(s, lowest, highest);
-
+	
+	/* Ha 0 a sebesség fékezünk. */
 	if (s == 0) {
 		setDirection(Direction::BRAKE);
 		analogWrite(speed, 0);

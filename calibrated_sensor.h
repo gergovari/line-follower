@@ -3,6 +3,7 @@
 #include "common.h"
 #include "sensor.h"
 
+/* Kiolvastuk a szenzor analóg értékét, de ezt fel kell dolgoznunk hogy használható legyen. */
 class CalibratedSensor : public Sensor {
 	private:
 		Sensor *sensor;

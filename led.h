@@ -2,6 +2,7 @@
 
 #include "common.h"
 
+/* Infrared LED-ek vezérlése. */
 class Led {
 	private:
 		Pin pin;

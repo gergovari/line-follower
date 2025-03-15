@@ -7,6 +7,7 @@ Steering::Steering(Motor *l, Motor *r) {
 	right = r;
 }
 
+/* TODO: Lehet elég naív megoldás, aki jobban ért ehhez átnézhetné. */
 void Steering::setTarget(signed int t) {
 	signed int l = 0;
 	signed int r = 0;

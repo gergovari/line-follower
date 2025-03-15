@@ -12,6 +12,8 @@ void SensorManager::setCallback(SensorManagerCallback cb) {
 }
 
 void SensorManager::tick() {
+	/* malloc beágyazott rendszerben?
+	 * Lehet csak odakell figyelni. Ha elég szenzort dobunk be unsafe. */
 	uint *values = malloc(size * sizeof(uint));
 	
 	for (int i = 0; i < size; i++) {
@@ -19,5 +21,9 @@ void SensorManager::tick() {
 	}
 
 	callback(values, size);
-	free(values);
+
+	/* Aki malloc-ot mond... */
+	for (int i = 0; i < size; i++) {
+		free(values[i]);
+	}
 }

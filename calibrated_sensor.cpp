@@ -21,6 +21,7 @@ uint CalibratedSensor::get() {
 	return constrain(map(value, rawLowest, rawHighest, lowest, highest), lowest, highest);
 }
 
+/* Megnézi hogy az éppeni érték szélsőérték -e. */
 void CalibratedSensor::calibrate() {
 	uint value = sensor->get();
 
