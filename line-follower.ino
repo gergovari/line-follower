@@ -10,8 +10,10 @@
 #include "raw_sensor.h"
 #include "calibrated_sensor.h"
 #include "sensor_manager.h"
+#include "motor.h"
 
 /* Hardver konfiguráció leírása */
+/* A dokumentációhoz képest angolul lettek a pinek elnevezve. */
 #define LED_SIZE 4
 #define LED1 8
 #define LED2 9
@@ -23,6 +25,14 @@
 #define SENSOR2 A1
 #define SENSOR3 A2
 #define SENSOR4 A3
+
+#define LFORW 4
+#define LBACK 7
+#define LSPEED 6
+
+#define RFORW 3
+#define RBACK 2
+#define RSPEED 5
 
 /* Kalibrációs paraméterek */
 #define SECOND 1000L
@@ -49,6 +59,9 @@ CalibratedSensor sensor4(&rawSensor4);
 
 CalibratedSensor *sensors[SENSOR_SIZE] = { &sensor1, &sensor2, &sensor3, &sensor4 };
 SensorManager sensorManager((Sensor**)&sensors, SENSOR_SIZE);
+
+Motor leftMotor(LFORW, LBACK, LSPEED);
+Motor rightMotor(RFORW, RBACK, RSPEED);
 
 void startSpinSequence() {
 
@@ -78,15 +91,10 @@ void calibrateSensors(uint *l, uint *h) {
 	stopSpinSequence();
 }
 
-void setup()
-{
+void calibrateSequence() {
 	uint l = 0;
 	uint h = 0;
 
-	Serial.begin(9600);
-	
-	sensorManager.setCallback(&sensorCb);
-	
 	Serial.println("Starting calibration sequence...");
 	calibrateSensors(&l, &h);
 	Serial.print("Done calibration sequence: ");
@@ -96,14 +104,18 @@ void setup()
 	Serial.println();
 }
 
+void setup()
+{
+	Serial.begin(9600);
+	
+	sensorManager.setCallback(&sensorCb);
+	calibrateSequence();	
+}
+
 /* Ha a DEMO-t 1-re rakjuk akkor nem az alap program fog lefutni 
  * hanem a hardver fog mindent bemutatni amit tud. 
  * Érdemes nem lerakni a földre ilyenkor a robotot. */
-#define DEMO 0
-#if demo
-void demo() {
-	test_leds();
-}
+#define DEMO 1
 
 void test_leds() {
 	delay(500);
@@ -131,7 +143,20 @@ void test_leds() {
 	led4.set(true);
 	delay(500);
 }
-#endif /* DEMO */
+void test_motors() {
+	leftMotor.setSpeed(1000);
+	rightMotor.setSpeed(1000);
+	delay(2000);
+	leftMotor.setSpeed(1);
+	rightMotor.setSpeed(1);
+	delay(2000);
+	leftMotor.setSpeed(0);
+	rightMotor.setSpeed(0);
+}
+void demo() {
+	test_leds();
+	test_motors();
+}
 
 /* Itt lehet majd a szenzor értékek alapján a motorok sebességét irányítani. */
 void sensorCb(uint *values, uint size) {
