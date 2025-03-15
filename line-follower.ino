@@ -146,9 +146,15 @@ void test_leds() {
 void test_motors() {
 	leftMotor.setSpeed(1000);
 	rightMotor.setSpeed(1000);
+	delay(1000);
+	leftMotor.setSpeed(-1);
+	rightMotor.setSpeed(-1);
 	delay(2000);
-	leftMotor.setSpeed(1);
-	rightMotor.setSpeed(1);
+	leftMotor.setSpeed(1000);
+	rightMotor.setSpeed(1000);
+	delay(1000);
+	leftMotor.setSpeed(-1);
+	rightMotor.setSpeed(-1);
 	delay(2000);
 	leftMotor.setSpeed(0);
 	rightMotor.setSpeed(0);

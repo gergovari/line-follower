@@ -14,6 +14,37 @@ Motor::Motor(Pin f, Pin b, Pin s) {
 	setSpeed(0);
 }
 
-void Motor::setSpeed(uint s) {
-	analogWrite(speed, map(constrain(s, inLowest, inHighest), inLowest, inHighest, outLowest, outHighest));
+void Motor::setDirection(Direction dir) {
+	bool f = false;
+	bool b = false;
+
+	switch (dir) {
+		case Direction::FORWARD:
+			f = true;
+			b = false;
+			break;
+		case Direction::BACKWARD:
+			f = false;
+			b = true;
+			break;
+		case Direction::BRAKE:
+		default:
+			f = true;
+			b = true;
+	}
+
+	digitalWrite(forward, f);
+	digitalWrite(backward, b);
+}
+
+void Motor::setSpeed(signed int s) {
+	s = constrain(s, inLowest, inHighest);
+
+	if (s == 0) {
+		setDirection(Direction::BRAKE);
+		analogWrite(speed, 0);
+	} else {
+		setDirection(s > 0 ? Direction::FORWARD : Direction::BACKWARD);
+		analogWrite(speed, map(abs(s), 0, inHighest, outLowest, outHighest));
+	}
 }
