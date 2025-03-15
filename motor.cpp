@@ -38,13 +38,13 @@ void Motor::setDirection(Direction dir) {
 }
 
 void Motor::setSpeed(signed int s) {
-	s = constrain(s, inLowest, inHighest);
+	s = constrain(s, lowest, highest);
 
 	if (s == 0) {
 		setDirection(Direction::BRAKE);
 		analogWrite(speed, 0);
 	} else {
 		setDirection(s > 0 ? Direction::FORWARD : Direction::BACKWARD);
-		analogWrite(speed, map(abs(s), 0, inHighest, outLowest, outHighest));
+		analogWrite(speed, map(abs(s), 0, highest, outLowest, outHighest));
 	}
 }

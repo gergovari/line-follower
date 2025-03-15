@@ -11,6 +11,15 @@
 #include "calibrated_sensor.h"
 #include "sensor_manager.h"
 #include "motor.h"
+#include "steering.h"
+
+/* Ha a DEMO-t 1-re rakjuk akkor nem az alap program fog lefutni 
+ * hanem a hardver fog mindent bemutatni amit tud. 
+ * Érdemes nem lerakni a földre ilyenkor a robotot. */
+#define DEMO 0
+#if DEMO
+#include "demo.h"
+#endif /* DEMO */
 
 /* Hardver konfiguráció leírása */
 /* A dokumentációhoz képest angolul lettek a pinek elnevezve. */
@@ -62,18 +71,19 @@ SensorManager sensorManager((Sensor**)&sensors, SENSOR_SIZE);
 
 Motor leftMotor(LFORW, LBACK, LSPEED);
 Motor rightMotor(RFORW, RBACK, RSPEED);
+Steering steering(&leftMotor, &rightMotor);
 
+/* TODO: finetune */
 void startSpinSequence() {
-
-	/* TODO: make robot spin around */
+	steering.setTarget(-1000);
 }
 
 void stopSpinSequence() {
 
-	/* TODO: make robot stop spinning */
+	steering.stop();
 }
 
-void calibrateSensors(uint *l, uint *h) {
+void calibrateSensors() {
 	/* 5 seconds */
 	uint time = CALIBRATION_SECS * SECOND; 
 
@@ -84,92 +94,28 @@ void calibrateSensors(uint *l, uint *h) {
 	
 	for(long start = millis(); millis() - start < time;) {
 		for (int i = 0; i < sizeof(sensors) / sizeof(CalibratedSensor*); i++) {
-			sensors[i]->calibrate(l, h);
+			sensors[i]->calibrate();
 		}
 	}
 
 	stopSpinSequence();
 }
 
-void calibrateSequence() {
-	uint l = 0;
-	uint h = 0;
-
-	Serial.println("Starting calibration sequence...");
-	calibrateSensors(&l, &h);
-	Serial.print("Done calibration sequence: ");
-	Serial.print(l);
-	Serial.print(", ");
-	Serial.print(h);
-	Serial.println();
-}
-
 void setup()
 {
 	Serial.begin(9600);
 	
+#if !DEMO
 	sensorManager.setCallback(&sensorCb);
-	calibrateSequence();	
-}
-
-/* Ha a DEMO-t 1-re rakjuk akkor nem az alap program fog lefutni 
- * hanem a hardver fog mindent bemutatni amit tud. 
- * Érdemes nem lerakni a földre ilyenkor a robotot. */
-#define DEMO 1
-
-void test_leds() {
-	delay(500);
-	led1.set(false);
-	delay(2000);
-
-	led2.set(false);
-	delay(2000);
-
-	led3.set(false);
-	delay(2000);
-
-	led4.set(false);
-	delay(2000);
-
-	led1.set(true);
-	delay(500);
-
-	led2.set(true);
-	delay(500);
-
-	led3.set(true);
-	delay(500);
-
-	led4.set(true);
-	delay(500);
-}
-void test_motors() {
-	leftMotor.setSpeed(1000);
-	rightMotor.setSpeed(1000);
-	delay(1000);
-	leftMotor.setSpeed(-1);
-	rightMotor.setSpeed(-1);
-	delay(2000);
-	leftMotor.setSpeed(1000);
-	rightMotor.setSpeed(1000);
-	delay(1000);
-	leftMotor.setSpeed(-1);
-	rightMotor.setSpeed(-1);
-	delay(2000);
-	leftMotor.setSpeed(0);
-	rightMotor.setSpeed(0);
-}
-void demo() {
-	test_leds();
-	test_motors();
+	Serial.println("Starting calibration sequence...");
+	calibrateSensors();	
+	Serial.println("Done calibration.");
+#endif /* DEMO */
 }
 
 /* Itt lehet majd a szenzor értékek alapján a motorok sebességét irányítani. */
 void sensorCb(uint *values, uint size) {
-	Serial.print(values[0]);
-	Serial.print(", ");
-	Serial.print(rawSensor1.get());
-	Serial.println();
+	/* TODO: control logic */
 }
 
 void followLine() {
@@ -180,7 +126,8 @@ void followLine() {
 void loop()
 {
 #if DEMO
-	demo();
+	demo(&led1, &led2, &led3, &led4, &leftMotor, &rightMotor, &steering);
+	Serial.println("demo mode");
 #else
 	followLine();
 #endif /* DEMO */

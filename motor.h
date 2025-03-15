@@ -6,8 +6,6 @@ enum class Direction { FORWARD, BACKWARD, BRAKE };
 
 class Motor {
 	private:
-		signed int inHighest = 1000;
-		signed int inLowest = -1000;
 		
 		/* FIXME: assuming 8-bit PWM output */
 		uint outLowest = 255 / 2;
@@ -19,6 +17,9 @@ class Motor {
 		
 		void setDirection(Direction dir);
 	public:
+		signed int highest = 1000;
+		signed int lowest = -1000;
+
 		Motor(Pin f, Pin b, Pin s);
 		
 		void setSpeed(signed int s);

@@ -21,13 +21,9 @@ uint CalibratedSensor::get() {
 	return constrain(map(value, rawLowest, rawHighest, lowest, highest), lowest, highest);
 }
 
-void CalibratedSensor::calibrate(uint *l, uint *h) {
+void CalibratedSensor::calibrate() {
 	uint value = sensor->get();
 
 	rawHighest = value > rawHighest ? value : rawHighest;
 	rawLowest = value < rawLowest ? value : rawLowest;
-	
-	/* Debug purposes. */
-	(*l) = rawLowest;
-	(*h) = rawHighest;
 }

@@ -18,6 +18,6 @@ class CalibratedSensor : public Sensor {
 		
 		/* A pillanatnyi értéket hozzáveti az eddigi min/max értékekhez,
 		 * és elmenti ha alulmúlja/megugorja az eddigi értékeket. */
-		void calibrate(uint *l, uint *h);
+		void calibrate();
 };
 
