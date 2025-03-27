@@ -2,7 +2,8 @@
 
 #include <Arduino.h>
 
-CalibratedSensor::CalibratedSensor(Sensor *s) {
+CalibratedSensor::CalibratedSensor(Sensor *s, bool r) {
+	reversed = r;
 	sensor = s;
 	
 	/* Megfordítjuk a szélsőértékeket hogy legyen mihez majd kalibrálni. */
@@ -13,12 +14,14 @@ CalibratedSensor::CalibratedSensor(Sensor *s) {
 	highest = 1000;
 }
 
+CalibratedSensor::CalibratedSensor(Sensor *s) : CalibratedSensor(s, true) {}
+
 uint CalibratedSensor::get() {
 	uint value = sensor->get();
 	
 	/* Remap-eljük a nyers értéket a kalibráció alapján 
 	 * és normalizáljuk 0-1000 értékre. */
-	return constrain(map(value, rawLowest, rawHighest, lowest, highest), lowest, highest);
+	return (reversed) * (highest) - constrain(map(value, rawLowest, rawHighest, lowest, highest), lowest, highest);
 }
 
 /* Megnézi hogy az éppeni érték szélsőérték -e. */

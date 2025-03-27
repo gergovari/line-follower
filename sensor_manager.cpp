@@ -7,8 +7,15 @@ SensorManager::SensorManager(Sensor **se, uint si) {
 	size = si;
 }
 
-void SensorManager::setCallback(SensorManagerCallback cb) {
+void SensorManager::setCallback(SensorManagerCallback cb, void* u) {
 	callback = cb;
+	user = u;
+}
+
+void SensorManager::calibrate() {
+	for (int i = 0; i < size; i++) {
+		sensors[i]->calibrate();
+	}
 }
 
 void SensorManager::tick() {
@@ -20,7 +27,7 @@ void SensorManager::tick() {
 		values[i] = sensors[i]->get();
 	}
 
-	callback(values, size);
+	callback(values, size, user);
 
 	/* Aki malloc-ot mond... */
 	free(values);

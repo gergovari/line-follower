@@ -10,13 +10,14 @@
 #include "raw_sensor.h"
 #include "calibrated_sensor.h"
 #include "sensor_manager.h"
+#include "weighted_sensor_manager.h"
 #include "motor.h"
 #include "steering.h"
 
 /* Ha a DEMO-t 1-re rakjuk akkor nem az alap program fog lefutni 
  * hanem a hardver fog mindent bemutatni amit tud. 
  * Érdemes nem lerakni a földre ilyenkor a robotot. */
-#define DEMO 1
+#define DEMO 0
 #if DEMO
 #include "demo.h"
 #endif /* DEMO */
@@ -67,25 +68,23 @@ RawSensor rawSensor4(SENSOR4);
 CalibratedSensor sensor4(&rawSensor4);
 
 CalibratedSensor *sensors[SENSOR_SIZE] = { &sensor1, &sensor2, &sensor3, &sensor4 };
-SensorManager sensorManager((Sensor**)&sensors, SENSOR_SIZE);
+double weights[SENSOR_SIZE] = { -1, 0, .5, 1 };
+
+SensorManager sensorManager(sensors, SENSOR_SIZE);
+WeightedSensorManager weightedManager(&sensorManager, 1, weights);
 
 Motor leftMotor(LFORW, LBACK, LSPEED);
 Motor rightMotor(RFORW, RBACK, RSPEED);
 Steering steering(&leftMotor, &rightMotor);
 
-/* TODO: finetune, might be too violent of a spin */
+/* TODO: sequence API? */
 void startSpinSequence() {
 	steering.setTarget(-1000);
 }
-
-/* TODO; counteract spin? idk how this will behave. */
 void stopSpinSequence() {
-
 	steering.stop();
 }
-
 void calibrateSensors() {
-	/* 5 seconds */
 	uint time = CALIBRATION_SECS * SECOND; 
 
 	/* Ha megpörgetjük a robotot úgy hogy mindenféle színen 
@@ -94,38 +93,34 @@ void calibrateSensors() {
 	startSpinSequence();
 	
 	for(long start = millis(); millis() - start < time;) {
-		for (int i = 0; i < sizeof(sensors) / sizeof(CalibratedSensor*); i++) {
-			sensors[i]->calibrate();
-		}
+		sensorManager.calibrate();
 	}
 
 	stopSpinSequence();
 }
 
-void setup()
-{
+void setup() {
 	Serial.begin(9600);
 	
 #if !DEMO
-	sensorManager.setCallback(&sensorCb);
+	weightedManager.setCallback(&wCb);
+
 	Serial.println("Starting calibration sequence...");
 	calibrateSensors();	
 	Serial.println("Done calibration.");
 #endif /* DEMO */
 }
 
-/* Itt lehet majd a szenzor értékek alapján a motorok sebességét irányítani. */
-void sensorCb(uint *values, uint size) {
-	/* TODO: control logic */
+void wCb(int value) {
+	Serial.println(value);
 }
 
 void followLine() {
 	/* Ezzel indítjuk el a szenzor olvasást. */
-	sensorManager.tick();
+	weightedManager.tick();
 }
 
-void loop()
-{
+void loop() {
 #if DEMO
 	demo(&led1, &led2, &led3, &led4, &leftMotor, &rightMotor, &steering);
 	Serial.println("demo mode");
