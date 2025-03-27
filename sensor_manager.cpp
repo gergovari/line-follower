@@ -23,7 +23,5 @@ void SensorManager::tick() {
 	callback(values, size);
 
 	/* Aki malloc-ot mond... */
-	for (int i = 0; i < size; i++) {
-		free(values[i]);
-	}
+	free(values);
 }
