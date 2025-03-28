@@ -10,7 +10,7 @@
 #include "raw_sensor.h"
 #include "calibrated_sensor.h"
 #include "sensor_manager.h"
-#include "weighted_sensor_manager.h"
+#include "symmetric_sensor_reader.h"
 #include "motor.h"
 #include "steering.h"
 
@@ -56,54 +56,44 @@ Led led3(LED3);
 Led led4(LED4);
 
 RawSensor rawSensor1(SENSOR1);
-CalibratedSensor sensor1(&rawSensor1);
-
 RawSensor rawSensor2(SENSOR2);
-CalibratedSensor sensor2(&rawSensor2);
-
 RawSensor rawSensor3(SENSOR3);
-CalibratedSensor sensor3(&rawSensor3);
-
 RawSensor rawSensor4(SENSOR4);
-CalibratedSensor sensor4(&rawSensor4);
 
+CalibratedSensor sensor1(&rawSensor1, true);
+CalibratedSensor sensor2(&rawSensor2, true);
+CalibratedSensor sensor3(&rawSensor3, true);
+CalibratedSensor sensor4(&rawSensor4, true);
 CalibratedSensor *sensors[SENSOR_SIZE] = { &sensor1, &sensor2, &sensor3, &sensor4 };
-double weights[SENSOR_SIZE] = { -1, 0, .5, 1 };
 
-SensorManager sensorManager(sensors, SENSOR_SIZE);
-WeightedSensorManager weightedManager(&sensorManager, 1, weights);
+SensorManager manager(sensors, SENSOR_SIZE);
+SymmetricSensorReader reader;
+
+//ProportionalController p(1.0):
+/*IntegralController i(1.0):
+DerivateController d(1.0):*/
 
 Motor leftMotor(LFORW, LBACK, LSPEED);
 Motor rightMotor(RFORW, RBACK, RSPEED);
 Steering steering(&leftMotor, &rightMotor);
 
 /* TODO: sequence API? */
-void startSpinSequence() {
-	steering.setTarget(-1000);
-}
-void stopSpinSequence() {
-	steering.stop();
-}
 void calibrateSensors() {
-	uint time = CALIBRATION_SECS * SECOND; 
-
 	/* Ha megpörgetjük a robotot úgy hogy mindenféle színen 
 	 * (értsd vonal és alatta padló) átmegy, 
 	 * akkor a lehetséges szenzor értékeket megkaphatjuk. */
-	startSpinSequence();
-	
-	for(long start = millis(); millis() - start < time;) {
-		sensorManager.calibrate();
+	steering.setTarget(-1000);
+	for(long start = millis(); millis() - start < CALIBRATION_SECS * SECOND;) {
+		manager.calibrate();
 	}
-
-	stopSpinSequence();
+	steering.stop();
 }
 
 void setup() {
 	Serial.begin(9600);
 	
 #if !DEMO
-	weightedManager.setCallback(&wCb);
+	manager.setCallback(&managerCb, nullptr);
 
 	Serial.println("Starting calibration sequence...");
 	calibrateSensors();	
@@ -111,13 +101,19 @@ void setup() {
 #endif /* DEMO */
 }
 
-void wCb(int value) {
-	Serial.println(value);
-}
+void managerCb(uint *values, uint size) {
+	int out = 0;
 
-void followLine() {
-	/* Ezzel indítjuk el a szenzor olvasást. */
-	weightedManager.tick();
+	reader.calculate(values, size, &out);
+	//p.calculate(out, &out);
+	
+	/*for (uint i = 0; i < size; i++) {
+		Serial.print(values[i]);
+		Serial.print(" ");
+	}
+	Serial.print(":");*/
+	Serial.println(out);
+	steering.setTarget(out);
 }
 
 void loop() {
@@ -125,6 +121,6 @@ void loop() {
 	demo(&led1, &led2, &led3, &led4, &leftMotor, &rightMotor, &steering);
 	Serial.println("demo mode");
 #else
-	followLine();
+	manager.tick();
 #endif /* DEMO */
 }
