@@ -13,9 +13,7 @@
 #include "sensor_manager.h"
 #include "symmetric_sensor_reader.h"
 
-#include "proportional_controller.h"
-#include "integral_controller.h"
-#include "derivate_controller.h"
+#include "pid_controller.h"
 
 #include "motor.h"
 #include "steering.h"
@@ -81,9 +79,8 @@ CalibratedSensor *sensors[SENSOR_SIZE] = { &sensor1, &sensor2, &sensor3, &sensor
 SensorManager manager(sensors, SENSOR_SIZE);
 SymmetricSensorReader reader;
 
-ProportionalController p(TARGET, KP);
-IntegralController i(KI);
-DerivateController d(KD);
+PIDParameters parameters(TARGET, KP, KI, KD);
+PIDController pid(parameters);
 
 Motor leftMotor(LFORW, LBACK, LSPEED);
 Motor rightMotor(RFORW, RBACK, RSPEED);
@@ -116,15 +113,8 @@ void setup() {
 void managerCb(uint *values, uint size) {
 	int out = 0;
 
-	int pE = 0;
-	int iE = 0;
-	int dE = 0;
-
 	reader.calculate(values, size, &out);
-	if (p.kp != 0) p.calculate(out, &pE);
-	if (i.ki != 0) i.calculate(pE, &iE);
-	if (d.kd != 0) d.calculate(pE, &dE);
-	out = constrain(map(pE + iE + dE, -1000 * p.kp, 1000 * p.kp, -1000, 1000), -1000, 1000);
+	pid.calculate(out, &out);
 
 	Serial.println(-out);
 	steering.setTarget(-out);
