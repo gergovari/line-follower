@@ -7,7 +7,6 @@ Steering::Steering(Motor *l, Motor *r) {
 	right = r;
 }
 
-/* TODO: Lehet elég naív megoldás, aki jobban ért ehhez átnézhetné. */
 void Steering::setTarget(signed int t) {
 	signed int l = 0;
 	signed int r = 0;
@@ -16,10 +15,12 @@ void Steering::setTarget(signed int t) {
 	
 	if (t > 0) {
 		l = (signed int)(left->highest * ((float)t / highest));
-		r = (signed int)(right->highest * (1 - (float)t / highest));
+		//r = (signed int)(right->highest * (1 - (float)t / highest));
+		r = 0;
 	} else if (t < 0) {
 		t = abs(t);
-		l = (signed int)(left->highest * (1 - (float)t / highest));
+		//l = (signed int)(left->highest * (1 - (float)t / highest));
+		l = 0;
 		r = (signed int)(right->highest * ((float)t / highest));
 	} else {
 		l = left->highest;

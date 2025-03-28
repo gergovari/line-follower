@@ -2,7 +2,7 @@
 
 #include <Arduino.h>
 
-static void SymmetricSensorReader::calculate(uint *values, uint size, int *out) {
+void SymmetricSensorReader::calculate(uint *values, uint size, int *out) {
 	if (size % 2 != 0) return;
 	int temp = 0;
 

@@ -8,5 +8,5 @@ class SensorReader {
 		static const int lowest = -1000;
 		static const int highest = 1000;
 
-		static void calculate(uint *values, uint size, int *out);
+		virtual void calculate(uint *values, uint size, int *out);
 };

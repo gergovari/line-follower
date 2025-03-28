@@ -5,5 +5,5 @@
 
 class SymmetricSensorReader : public SensorReader {
 	public:
-		static void calculate(uint *values, uint size, int *out);
+		void calculate(uint *values, uint size, int *out);
 };

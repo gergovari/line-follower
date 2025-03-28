@@ -9,8 +9,14 @@
 #include "led.h"
 #include "raw_sensor.h"
 #include "calibrated_sensor.h"
+
 #include "sensor_manager.h"
 #include "symmetric_sensor_reader.h"
+
+#include "proportional_controller.h"
+#include "integral_controller.h"
+#include "derivate_controller.h"
+
 #include "motor.h"
 #include "steering.h"
 
@@ -48,6 +54,12 @@
 #define SECOND 1000L
 #define CALIBRATION_SECS 5
 
+/* PID controller */
+#define TARGET 0
+#define KP 0.1
+#define KI 0.001
+#define KD 0.1
+
 /* TODO: if someone knows some macro tricks 
  * for repeating these I'd much appreciate it. */
 Led led1(LED1);
@@ -69,9 +81,9 @@ CalibratedSensor *sensors[SENSOR_SIZE] = { &sensor1, &sensor2, &sensor3, &sensor
 SensorManager manager(sensors, SENSOR_SIZE);
 SymmetricSensorReader reader;
 
-//ProportionalController p(1.0):
-/*IntegralController i(1.0):
-DerivateController d(1.0):*/
+ProportionalController p(TARGET, KP);
+IntegralController i(KI);
+DerivateController d(KD);
 
 Motor leftMotor(LFORW, LBACK, LSPEED);
 Motor rightMotor(RFORW, RBACK, RSPEED);
@@ -104,16 +116,18 @@ void setup() {
 void managerCb(uint *values, uint size) {
 	int out = 0;
 
+	int pE = 0;
+	int iE = 0;
+	int dE = 0;
+
 	reader.calculate(values, size, &out);
-	//p.calculate(out, &out);
-	
-	/*for (uint i = 0; i < size; i++) {
-		Serial.print(values[i]);
-		Serial.print(" ");
-	}
-	Serial.print(":");*/
-	Serial.println(out);
-	steering.setTarget(out);
+	if (p.kp != 0) p.calculate(out, &pE);
+	if (i.ki != 0) i.calculate(pE, &iE);
+	if (d.kd != 0) d.calculate(pE, &dE);
+	out = constrain(map(pE + iE + dE, -1000 * p.kp, 1000 * p.kp, -1000, 1000), -1000, 1000);
+
+	Serial.println(-out);
+	steering.setTarget(-out);
 }
 
 void loop() {
