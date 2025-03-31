@@ -80,7 +80,9 @@ SensorManager manager(sensors, SENSOR_SIZE);
 SymmetricSensorReader reader;
 
 PIDParameters parameters(TARGET, KP, KI, KD);
-PIDController pid(parameters);
+PIDController controller(parameters);
+
+/*BangController controller(parameters);*/
 
 Motor leftMotor(LFORW, LBACK, LSPEED);
 Motor rightMotor(RFORW, RBACK, RSPEED);
@@ -114,7 +116,7 @@ void managerCb(uint *values, uint size) {
 	int out = 0;
 
 	reader.calculate(values, size, &out);
-	pid.calculate(out, &out);
+	controller.calculate(out, &out);
 
 	Serial.println(out);
 	steering.setTarget(out);
