@@ -116,8 +116,8 @@ void managerCb(uint *values, uint size) {
 	reader.calculate(values, size, &out);
 	pid.calculate(out, &out);
 
-	Serial.println(-out);
-	steering.setTarget(-out);
+	Serial.println(out);
+	steering.setTarget(out);
 }
 
 void loop() {
