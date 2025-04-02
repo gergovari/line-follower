@@ -65,8 +65,8 @@
 /* PID controller */
 #define TARGET 0
 #define KP .005
-#define KI 0.0005
-#define KD .8
+#define KI 0.0001
+#define KD .01
 
 /* TODO: if someone knows some macro tricks 
  * for repeating these I'd much appreciate it. */
