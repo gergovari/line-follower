@@ -52,11 +52,18 @@
 #define SECOND 1000L
 #define CALIBRATION_SECS 5
 
+/*
+ * 1 - Raw bang
+ * 2 - Bang
+ * 3 - PID
+ */
+#define CONTROLLER 3
+
 /* PID controller */
 #define TARGET 0
-#define KP 0.1
-#define KI 0.001
-#define KD 0.1
+#define KP 1
+#define KI 0
+#define KD 0
 
 /* TODO: if someone knows some macro tricks 
  * for repeating these I'd much appreciate it. */
@@ -79,10 +86,14 @@ CalibratedSensor *sensors[SENSOR_SIZE] = { &sensor1, &sensor2, &sensor3, &sensor
 SensorManager manager(sensors, SENSOR_SIZE);
 SymmetricSensorReader reader;
 
+#if CONTROLLER == 1
+BangRawController rawController(false);
+#elif CONTROLLER == 2
+BangController controller();
+#else
 PIDParameters parameters(TARGET, KP, KI, KD);
 PIDController controller(parameters);
-
-/*BangController controller(parameters);*/
+#endif /* CONTROLLER */
 
 Motor leftMotor(LFORW, LBACK, LSPEED);
 Motor rightMotor(RFORW, RBACK, RSPEED);
@@ -114,9 +125,13 @@ void setup() {
 
 void managerCb(uint *values, uint size) {
 	int out = 0;
-
+	
+	#if CONTROLLER == 1 
+	rawController.calculate(values, size, &out);
+	#else
 	reader.calculate(values, size, &out);
 	controller.calculate(out, &out);
+	#endif /* CONTROLLER */
 
 	Serial.println(out);
 	steering.setTarget(out);
