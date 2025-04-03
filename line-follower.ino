@@ -54,6 +54,18 @@
  */
 #define CONTROLLER 3
 
+/* Reader types
+ * 1 - Symmetric reader: gives each sensor 
+ *     less weight as we get closer to the center.
+ * 2 - Discreet reader: Composited from the 
+ *     symmetric reader, but if we're arbitrarily close
+ *     to 0 the given value will be 0.
+ */
+#define READER 2
+
+/* Discreet reader configuration */
+#define CUTOFF 300
+
 /* PID controller configuration */
 #define TARGET 0
 #define KP .005
@@ -79,8 +91,12 @@ CalibratedSensor sensor4(&rawSensor4, true);
 CalibratedSensor *sensors[SENSOR_SIZE] = { &sensor1, &sensor2, &sensor3, &sensor4 };
 
 SensorManager manager(sensors, SENSOR_SIZE);
-//SymmetricSensorReader reader;
-DiscreetSensorReader reader(300);
+
+#if READER == 1
+SymmetricSensorReader reader;
+#else
+DiscreetSensorReader reader(CUTOFF);
+#endif /* READER */
 
 #if CONTROLLER == 1
 BangRawController rawController(false);

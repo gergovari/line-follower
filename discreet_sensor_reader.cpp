@@ -4,26 +4,15 @@
 
 DiscreetSensorReader::DiscreetSensorReader(uint c) {
 	cutoff = c;
+	reader = new SymmetricSensorReader();
+}
+
+DiscreetSensorReader::~DiscreetSensorReader() {
+	free(reader);
 }
 
 void DiscreetSensorReader::calculate(uint *values, uint size, int *out) {
-	if (size % 2 != 0) return;
-	int temp = 0;
+	reader->calculate(values, size, out);
 
-	for (uint i = 0; i < size / 2; i++) {
-		temp += values[i] * ((double)1 / pow(2, i));
-		if (temp < cutoff) {
-			temp = 0;
-		}
-	}
-	(*out) -= constrain(temp, 0, max(abs(lowest), abs(highest)));
-	
-	temp = 0;
-	for (uint i = size / 2; i < size; i++) {
-		temp += values[i] * ((double)1 / pow(2, (size - 1) - i));
-		if (temp < cutoff) {
-			temp = 0;
-		}
-	}
-	(*out) += constrain(temp, 0, max(abs(lowest), abs(highest)));
+	(*out) = abs(*out) < cutoff ? 0 : (*out);
 }
