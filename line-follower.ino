@@ -5,6 +5,7 @@
 #include "led.h"
 #include "raw_sensor.h"
 #include "calibrated_sensor.h"
+#include "discreet_sensor.h"
 
 #include "sensor_manager.h"
 #include "symmetric_sensor_reader.h"
@@ -43,9 +44,15 @@
 #define RBACK 2
 #define RSPEED 5
 
-/* Calibration parameters */
+/* Calibration configuration */
 #define SECOND 1000L
 #define CALIBRATION_SECS 3
+
+/* Calibrated sensor configuration */
+#define REVERSED true
+
+/* Discreet sensor configuration */
+#define THRESHOLD 0.7
 
 /* Controller types
  * 1 - Raw bang (simple, rudimentary)
@@ -79,18 +86,25 @@ Led led2(LED2);
 Led led3(LED3);
 Led led4(LED4);
 
-RawSensor rawSensor1(SENSOR1);
-RawSensor rawSensor2(SENSOR2);
-RawSensor rawSensor3(SENSOR3);
-RawSensor rawSensor4(SENSOR4);
+RawSensor raw1(SENSOR1);
+RawSensor raw2(SENSOR2);
+RawSensor raw3(SENSOR3);
+RawSensor raw4(SENSOR4);
 
-CalibratedSensor sensor1(&rawSensor1, true);
-CalibratedSensor sensor2(&rawSensor2, true);
-CalibratedSensor sensor3(&rawSensor3, true);
-CalibratedSensor sensor4(&rawSensor4, true);
-CalibratedSensor *calibratedSensors[SENSOR_SIZE] = { &sensor1, &sensor2, &sensor3, &sensor4 };
+CalibratedSensor calibrated1(&raw1, REVERSED);
+CalibratedSensor calibrated2(&raw2, REVERSED);
+CalibratedSensor calibrated3(&raw3, REVERSED);
+CalibratedSensor calibrated4(&raw4, REVERSED);
+CalibratedSensor *calibratedSensors[SENSOR_SIZE] = 
+	{ &calibrated1, &calibrated2, &calibrated3, &calibrated4 };
 
-SensorManager manager(calibratedSensors, SENSOR_SIZE);
+DiscreetSensor discreet1(&calibrated1, THRESHOLD);
+DiscreetSensor discreet2(&calibrated2, THRESHOLD);
+DiscreetSensor discreet3(&calibrated3, THRESHOLD);
+DiscreetSensor discreet4(&calibrated4, THRESHOLD);
+
+Sensor *sensors[SENSOR_SIZE] = { &discreet1, &discreet2, &discreet3, &discreet4 };
+SensorManager manager(sensors, SENSOR_SIZE);
 
 #if READER == 1
 SymmetricSensorReader reader;
