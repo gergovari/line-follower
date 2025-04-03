@@ -16,8 +16,6 @@ RawSensor::RawSensor(Pin p) {
 }
 
 uint RawSensor::get() {
-	/* Ez egy nyers érték, változik környezettel 
-	 * és akár fototranzisztoronként a jelentése. */
 	return constrain(analogRead(pin), lowest, highest);
 }
 

@@ -9,6 +9,5 @@ class RawSensor : public Sensor {
 	public:
 		RawSensor(Pin p);
 
-		/* A megadott szenzor nyers értékét olvassa ki. */
 		uint get();
 };

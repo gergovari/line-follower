@@ -1,9 +1,5 @@
 #include <Arduino.h>
 
-/* A megértéshez érdemes követni a lenti header és cpp fájlokat,
- * hisz nem akartam redundánsan dokumentálni. 
- * Amit angolul írtam nem olyan fontos. */
-
 #include "common.h"
 
 #include "led.h"
@@ -21,16 +17,12 @@
 #include "motor.h"
 #include "steering.h"
 
-/* Ha a DEMO-t 1-re rakjuk akkor nem az alap program fog lefutni 
- * hanem a hardver fog mindent bemutatni amit tud. 
- * Érdemes nem lerakni a földre ilyenkor a robotot. */
 #define DEMO 0
 #if DEMO
 #include "demo.h"
 #endif /* DEMO */
 
-/* Hardver konfiguráció leírása */
-/* A dokumentációhoz képest angolul lettek a pinek elnevezve. */
+/* Pin configuration */
 #define LED_SIZE 4
 #define LED1 8
 #define LED2 9
@@ -51,18 +43,18 @@
 #define RBACK 2
 #define RSPEED 5
 
-/* Kalibrációs paraméterek */
+/* Calibration parameters */
 #define SECOND 1000L
 #define CALIBRATION_SECS 3
 
-/*
- * 1 - Raw bang
- * 2 - Bang
- * 3 - PID
+/* Controller types
+ * 1 - Raw bang (simple, rudimentary)
+ * 2 - Bang (might not even work)
+ * 3 - PID (final choice) 
  */
 #define CONTROLLER 3
 
-/* PID controller */
+/* PID controller configuration */
 #define TARGET 0
 #define KP .005
 #define KI 0.0005
@@ -85,8 +77,6 @@ CalibratedSensor sensor2(&rawSensor2, true);
 CalibratedSensor sensor3(&rawSensor3, true);
 CalibratedSensor sensor4(&rawSensor4, true);
 CalibratedSensor *sensors[SENSOR_SIZE] = { &sensor1, &sensor2, &sensor3, &sensor4 };
-//RawSensor *rawSensors[SENSOR_SIZE] = { &rawSensor1, &rawSensor2, &rawSensor3, &rawSensor4 };
-//Pin pins[SENSOR_SIZE] = { SENSOR1, SENSOR2, SENSOR3, SENSOR4 };
 
 SensorManager manager(sensors, SENSOR_SIZE);
 //SymmetricSensorReader reader;
@@ -107,47 +97,43 @@ Steering steering(&leftMotor, &rightMotor);
 
 /* TODO: sequence API? */
 void calibrateSensors() {
-	/* Ha megpörgetjük a robotot úgy hogy mindenféle színen 
-	 * (értsd vonal és alatta padló) átmegy, 
-	 * akkor a lehetséges szenzor értékeket megkaphatjuk. */
+	/* Spin in a circle. */
 	steering.setTarget(-1000);
+	
+	/* For a set time keep calibrating the sensors. */
 	for(long start = millis(); millis() - start < CALIBRATION_SECS * SECOND;) {
 		manager.calibrate();
 	}
+
+	/* Stop spinning. */
 	steering.stop();
+}
+
+void setupLineFollowing() {
+	manager.setCallback(&managerCb, nullptr);
+
+	Serial.println("Starting calibration sequence...");
+	calibrateSensors();	
+	Serial.println("Done calibration.");
 }
 
 void setup() {
 	Serial.begin(9600);
 	
 #if !DEMO
-	manager.setCallback(&managerCb, nullptr);
-
-	Serial.println("Starting calibration sequence...");
-	calibrateSensors();	
-	Serial.println("Done calibration.");
+	setupLineFollowing();
 #endif /* DEMO */
 }
 
 void managerCb(uint *values, uint size) {
 	int out = 0;
-	
-	for (uint i = 0; i < size; i++) {
-		Serial.print(values[i]);
-		Serial.print(", ");
-	}
-	Serial.print(": ");
 
-	#if CONTROLLER == 1 
+#if CONTROLLER == 1 
 	rawController.calculate(values, size, &out);
-	#else
+#else
 	reader.calculate(values, size, &out);
-	Serial.print(out);
-	Serial.print(" => ");
 	controller.calculate(out, &out);
-	Serial.print(out);
-	Serial.println();
-	#endif /* CONTROLLER */
+#endif /* CONTROLLER */
 	
 	steering.setTarget(out);
 }

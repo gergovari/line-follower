@@ -4,7 +4,6 @@
 
 enum class Direction { FORWARD, BACKWARD, BRAKE };
 
-/* Motor irány és sebesség vezérlése. */
 class Motor {
 	private:
 		
@@ -16,7 +15,6 @@ class Motor {
 		Pin backward;
 		Pin speed;
 		
-		/* A JELORE és JHATRA pineket ez vezérli. */
 		void setDirection(Direction dir);
 	public:
 		signed int highest = 1000;
@@ -24,6 +22,5 @@ class Motor {
 
 		Motor(Pin f, Pin b, Pin s);
 		
-		/* A JSEBESSEG PWM output-ot ez vezérli. */
 		void setSpeed(signed int s);
 };

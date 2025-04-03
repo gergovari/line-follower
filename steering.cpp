@@ -15,11 +15,9 @@ void Steering::setTarget(signed int t) {
 	
 	if (t > 0) {
 		l = (signed int)(left->highest * ((float)t / highest));
-		//r = (signed int)(right->highest * (1 - (float)t / highest));
 		r = 0;
 	} else if (t < 0) {
 		t = abs(t);
-		//l = (signed int)(left->highest * (1 - (float)t / highest));
 		l = 0;
 		r = (signed int)(right->highest * ((float)t / highest));
 	} else {
