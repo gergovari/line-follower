@@ -88,9 +88,9 @@ CalibratedSensor sensor1(&rawSensor1, true);
 CalibratedSensor sensor2(&rawSensor2, true);
 CalibratedSensor sensor3(&rawSensor3, true);
 CalibratedSensor sensor4(&rawSensor4, true);
-CalibratedSensor *sensors[SENSOR_SIZE] = { &sensor1, &sensor2, &sensor3, &sensor4 };
+CalibratedSensor *calibratedSensors[SENSOR_SIZE] = { &sensor1, &sensor2, &sensor3, &sensor4 };
 
-SensorManager manager(sensors, SENSOR_SIZE);
+SensorManager manager(calibratedSensors, SENSOR_SIZE);
 
 #if READER == 1
 SymmetricSensorReader reader;
@@ -111,14 +111,20 @@ Motor leftMotor(LFORW, LBACK, LSPEED);
 Motor rightMotor(RFORW, RBACK, RSPEED);
 Steering steering(&leftMotor, &rightMotor);
 
-/* TODO: sequence API? */
 void calibrateSensors() {
+	for (uint i = 0; i < SENSOR_SIZE; i++) {
+		calibratedSensors[i]->calibrate();
+	}
+}
+
+/* TODO: sequence API? */
+void calibrationSequence() {
 	/* Spin in a circle. */
 	steering.setTarget(-1000);
 	
 	/* For a set time keep calibrating the sensors. */
 	for(long start = millis(); millis() - start < CALIBRATION_SECS * SECOND;) {
-		manager.calibrate();
+		calibrateSensors();
 	}
 
 	/* Stop spinning. */
@@ -129,7 +135,7 @@ void setupLineFollowing() {
 	manager.setCallback(&managerCb, nullptr);
 
 	Serial.println("Starting calibration sequence...");
-	calibrateSensors();	
+	calibrationSequence();	
 	Serial.println("Done calibration.");
 }
 

@@ -12,12 +12,6 @@ void SensorManager::setCallback(SensorManagerCallback cb, void* u) {
 	user = u;
 }
 
-void SensorManager::calibrate() {
-	for (int i = 0; i < size; i++) {
-		sensors[i]->calibrate();
-	}
-}
-
 void SensorManager::tick() {
 	uint *values = malloc(size * sizeof(uint));
 	
@@ -26,6 +20,5 @@ void SensorManager::tick() {
 	}
 
 	callback(values, size, user);
-
 	free(values);
 }
