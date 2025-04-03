@@ -5,9 +5,9 @@
 
 class DiscreetSensorReader : public SensorReader {
 	private:
-		uint forw = 0;
+		uint cutoff = 0;
 	public:
-		DiscreetSensorReader(uint f);
+		DiscreetSensorReader(uint c);
 
 		void calculate(uint *values, uint size, int *out);
 };

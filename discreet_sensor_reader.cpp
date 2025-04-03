@@ -2,8 +2,8 @@
 
 #include <Arduino.h>
 
-DiscreetSensorReader::DiscreetSensorReader(uint f) {
-	forw = f;
+DiscreetSensorReader::DiscreetSensorReader(uint c) {
+	cutoff = c;
 }
 
 void DiscreetSensorReader::calculate(uint *values, uint size, int *out) {
@@ -12,7 +12,7 @@ void DiscreetSensorReader::calculate(uint *values, uint size, int *out) {
 
 	for (uint i = 0; i < size / 2; i++) {
 		temp += values[i] * ((double)1 / pow(2, i));
-		if (temp < forw) {
+		if (temp < cutoff) {
 			temp = 0;
 		}
 	}
@@ -21,7 +21,7 @@ void DiscreetSensorReader::calculate(uint *values, uint size, int *out) {
 	temp = 0;
 	for (uint i = size / 2; i < size; i++) {
 		temp += values[i] * ((double)1 / pow(2, (size - 1) - i));
-		if (temp < forw) {
+		if (temp < cutoff) {
 			temp = 0;
 		}
 	}
