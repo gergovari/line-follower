@@ -2,14 +2,11 @@
 
 #include <Arduino.h>
 
-Led::Led(Pin p) {
+Led::Led(Pin p, bool start) {
 	pin = p;
 
 	pinMode(pin, OUTPUT);
-
-	/* Kezdjük bekapcsolva, elvileg úgy se fogunk ezzel babrálni. 
-	 * "De igazából nem tudom mennyi haszna lenne." */
-	set(true);
+	set(start);
 }
 
 void Led::set(bool state) {

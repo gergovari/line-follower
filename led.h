@@ -2,13 +2,12 @@
 
 #include "common.h"
 
-/* Infrared LED-ek vezérlése. */
 class Led {
 	private:
 		Pin pin;
 	public:
-		Led(Pin p);
+		Led(Pin p, bool start);
+		Led(Pin p) : Led(p, true) {};
 		
-		/* A megadott LED (ki/be) állapotát állítja be. */
 		void set(bool state);
 };
