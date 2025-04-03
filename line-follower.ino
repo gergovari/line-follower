@@ -54,10 +54,19 @@
 /* Discreet sensor configuration */
 #define THRESHOLD 0.7
 
+/* Sensor types
+ *  1 - Calibrated sensor: normalized, calibrated
+ *  2 - Discreet sensor: Composited from 
+        the calibrated sensor, 
+	but it only outputs discreet 0 or 1000 values.
+ * -1 - Raw: raw analog values (not recommended)
+ */
+#define SENSOR 2
+
 /* Controller types
- * 1 - Raw bang (simple, rudimentary)
- * 2 - Bang (might not even work)
- * 3 - PID (final choice) 
+ * 1 - Raw bang: simple, rudimentary
+ * 2 - Bang: might not even work
+ * 3 - PID: recommended
  */
 #define CONTROLLER 3
 
@@ -91,19 +100,30 @@ RawSensor raw2(SENSOR2);
 RawSensor raw3(SENSOR3);
 RawSensor raw4(SENSOR4);
 
+#if SENSOR == 1 || SENSOR == 2
 CalibratedSensor calibrated1(&raw1, REVERSED);
 CalibratedSensor calibrated2(&raw2, REVERSED);
 CalibratedSensor calibrated3(&raw3, REVERSED);
 CalibratedSensor calibrated4(&raw4, REVERSED);
 CalibratedSensor *calibratedSensors[SENSOR_SIZE] = 
 	{ &calibrated1, &calibrated2, &calibrated3, &calibrated4 };
+#endif /* SENSOR */
 
+#if SENSOR == 2
 DiscreetSensor discreet1(&calibrated1, THRESHOLD);
 DiscreetSensor discreet2(&calibrated2, THRESHOLD);
 DiscreetSensor discreet3(&calibrated3, THRESHOLD);
 DiscreetSensor discreet4(&calibrated4, THRESHOLD);
+#endif /* SENSOR */
 
+#if SENSOR == 1
+Sensor *sensors[SENSOR_SIZE] = { &calibrated1, &calibrated2, &calibrated3, &calibrated4 };
+#elif SENSOR == 2
 Sensor *sensors[SENSOR_SIZE] = { &discreet1, &discreet2, &discreet3, &discreet4 };
+#else
+Sensor *sensors[SENSOR_SIZE] = { &raw1, &raw2, &raw3, &raw4 };
+#endif /* SENSOR */
+
 SensorManager manager(sensors, SENSOR_SIZE);
 
 #if READER == 1
