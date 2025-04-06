@@ -25,5 +25,5 @@ void PIDController::calculate(int in, int *out) {
 	if (i->ki != 0) i->calculate(pE, &iE);
 	if (d->kd != 0) d->calculate(pE, &dE);
 
-	(*out) = constrain(map(pE + iE + dE, -1000 * p->kp, 1000 * p->kp, -1000, 1000), -1000, 1000);
+	(*out) = constrain(pE + iE + dE, lowest, highest);
 }

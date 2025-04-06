@@ -8,5 +8,5 @@ ProportionalController::ProportionalController(int t, double p) {
 }
 
 void ProportionalController::calculate(int in, int *out) {
-	(*out) = kp * -(target - in);
+	(*out) = constrain(kp * -(target - in), lowest, highest);
 }

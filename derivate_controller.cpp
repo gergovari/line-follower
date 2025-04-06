@@ -14,5 +14,5 @@ void DerivateController::calculate(int in, int *out) {
 	
 	int rate = (in - last) / elapsed;
 	last = in;
-	(*out) = kd * rate;
+	(*out) = constrain(kd * rate, lowest, highest);
 }
