@@ -15,6 +15,9 @@ class Display : public MenuConsumer {
 		~Display();
 		
 		void begin();
+		void clear();
+		void blink(bool state);
+		void blink();
 		void write(uint x, uint y, char *m);
 
 		void show(Menu *menu);

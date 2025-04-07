@@ -16,6 +16,22 @@ void Display::begin() {
 	lcd->clear();
 }
 
+void Display::clear() {
+	lcd->clear();
+}
+
+void Display::blink(bool state) {
+	if (state) {
+		lcd->blink();
+	} else {
+		lcd->noBlink();
+	}
+}
+
+void Display::blink() {
+	blink(true);
+}
+
 void Display::write(uint x, uint y, char *m) {
 	lcd->setCursor(x, y);
 	lcd->print(m);

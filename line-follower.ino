@@ -149,17 +149,13 @@ void calibrateSensors() {
 	}
 }
 
-/* TODO: sequence API? */
 void calibrationSequence() {
-	/* Spin in a circle. */
 	steering.setTarget(-1000);
-	
-	/* For a set time keep calibrating the sensors. */
+
 	for(long start = millis(); millis() - start < CALIBRATION_SECS * SECOND;) {
 		calibrateSensors();
 	}
 
-	/* Stop spinning. */
 	steering.stop();
 }
 
@@ -179,7 +175,8 @@ void managerCb(uint *values, uint size) {
 enum States {
 	STANDBY,
 	DEMO,
-	LINE_FOLLOWING
+	LINE_FOLLOWING,
+	CALIBRATION
 };
 
 States state = STANDBY;
@@ -188,11 +185,13 @@ States state = STANDBY;
 MenuManager menuManager;
 Display disp;
 
-char *setNames[1] = {
+char *setNames[2] = {
+	"CALIBR",
 	"PID",
 };
-void (*setFuncs[1])() = {
+void (*setFuncs[2])() = {
 	nullptr,
+	nullptr
 };
 Menu settings(setNames, setFuncs, 1);
 
@@ -215,10 +214,51 @@ void (*followFuncs[2])() = {
 };
 Menu follow(followNames, followFuncs, 2);
 
+void manualStart() {
+	state = CALIBRATION;
+}
+void manualStop() {
+	state = STANDBY;
+}
+
+char *manualNames[2] = {
+	"START",
+	"STOP"
+};
+void (*manualFuncs[2])() = {
+	manualStart,
+	manualStop
+};
+Menu manual(manualNames, manualFuncs, 2);
+
+void calibrationAutomatic() {
+	disp.clear();
+	disp.write(0, 0, "Calibration");
+	disp.write(0, 1, "started...");
+	disp.blink();
+	
+	calibrationSequence();
+
+	disp.show(menuManager.current);
+}
+void calibrationManual() {
+	menuManager.push(&manual);
+	disp.show(menuManager.current);
+}
+
+char *calibrationNames[2] = {
+	"AUTOMATIC",
+	"MANUAL"
+};
+void (*calibrationFuncs[2])() = {
+	calibrationAutomatic,
+	calibrationManual
+};
+Menu calibration(calibrationNames, calibrationFuncs, 2);
+
 void startCalibration() {
-	Serial.println("Starting calibration sequence...");
-	calibrationSequence();	
-	Serial.println("Done calibration.");
+	menuManager.push(&calibration);
+	disp.show(menuManager.current);
 }
 void startSettings() {
 	menuManager.push(&settings);
@@ -248,21 +288,17 @@ void (*startFuncs[4])() = {
 };
 Menu start(startNames, startFuncs, 4);
 
-
 void leftClick() {
 	menuManager.current->left();
 	disp.show(menuManager.current);
 }
-
 void rightClick() {
 	menuManager.current->right();
 	disp.show(menuManager.current);
 }
-
 void okClick() {
 	menuManager.current->execute();
 }
-
 void okHold() {
 	menuManager.back();
 	disp.show(menuManager.current);
@@ -298,6 +334,10 @@ void loop() {
 		case LINE_FOLLOWING:
 			Serial.println("LINE FOLLOWING");
 			manager.tick();
+			break;
+		case CALIBRATION:
+			Serial.println("CALIBRATION");
+			calibrateSensors();
 			break;
 		default:
 			break;
