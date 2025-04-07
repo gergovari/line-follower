@@ -3,7 +3,8 @@
 ConfiguredButton::ConfiguredButton(ButtonConfig c) {
 	btn = new OneButton(c.pin, true, true);
 
-	btn->attachClick(c.cb);
+	btn->attachClick(c.click);
+	btn->attachLongPressStart(c.hold);
 }
 
 ConfiguredButton::~ConfiguredButton() {

@@ -184,20 +184,30 @@ enum States {
 
 States state = STANDBY;
 
+
+MenuManager menuManager;
+Display disp;
+
+char *setNames[1] = {
+	"PID",
+};
+void (*setFuncs[1])() = {
+	nullptr,
+};
+Menu settings(setNames, setFuncs, 1);
+
 void startCalibration() {
 	Serial.println("Starting calibration sequence...");
 	calibrationSequence();	
 	Serial.println("Done calibration.");
 }
-
 void startSettings() {
-	// TODO
+	menuManager.push(&settings);
+	disp.show(menuManager.current);
 }
-
 void startDemo() {
 	state = DEMO;
 }
-
 void startLineFollowing() {
 	manager.setCallback(&managerCb, nullptr);
 	state = LINE_FOLLOWING;
@@ -207,7 +217,7 @@ char *startNames[4] = {
 	"CALIBR",
 	"SETTINGS",
 	"DEMO",
-	"START"
+	"FOLLOW"
 };
 void (*startFuncs[4])() = {
 	startCalibration,
@@ -217,26 +227,28 @@ void (*startFuncs[4])() = {
 };
 Menu start(startNames, startFuncs, 4);
 
-Menu *menu = &start;
-Display disp;
-
 void leftClick() {
-	menu->left();
-	disp.show(menu);
+	menuManager.current->left();
+	disp.show(menuManager.current);
 }
 
 void rightClick() {
-	menu->right();
-	disp.show(menu);
+	menuManager.current->right();
+	disp.show(menuManager.current);
 }
 
 void okClick() {
-	menu->execute();
+	menuManager.current->execute();
+}
+
+void okHold() {
+	menuManager.back();
+	disp.show(menuManager.current);
 }
 
 ButtonConfig left(8, leftClick);
 ButtonConfig right(9, rightClick);
-ButtonConfig ok(10, okClick);
+ButtonConfig ok(10, okClick, okHold);
 ButtonConfig *btns[3] = { &left, &right, &ok };
 
 Input input(btns, 3);
@@ -244,8 +256,9 @@ Input input(btns, 3);
 void setup() {
 	Serial.begin(9600);
 	disp.begin();
-
-	disp.show(menu);
+	
+	menuManager.current = &start;
+	disp.show(menuManager.current);
 }
 
 void loop() {
@@ -253,14 +266,14 @@ void loop() {
 
 	switch (state) {
 		case STANDBY:
-			Serial.println("STANDBY");
+			//Serial.println("STANDBY");
 			break;
 		case DEMO:
-			Serial.println("DEMO");
+			//Serial.println("DEMO");
 			//demo(&led1, &led2, &led3, &led4, &leftMotor, &rightMotor, &steering);
 			break;
 		case LINE_FOLLOWING:
-			Serial.println("LINE FOLLOWING");
+			//Serial.println("LINE FOLLOWING");
 			manager.tick();
 			break;
 		default:

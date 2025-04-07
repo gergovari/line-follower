@@ -6,9 +6,11 @@
 class ButtonConfig {
 	public:
 		Pin pin;
-		void (*cb)();
+		void (*click)();
+		void (*hold)();
 		
-		ButtonConfig(Pin p, void (*c)()) : pin(p), cb(c) {}
+		ButtonConfig(Pin p, void (*c)(), void (*h)()) : pin(p), click(c), hold(h) {}
+		ButtonConfig(Pin p, void (*c)()) : pin(p), click(c), hold(nullptr) {}
 };
 
 class ConfiguredButton {
