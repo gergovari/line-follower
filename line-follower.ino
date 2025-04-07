@@ -18,17 +18,17 @@
 #include "motor.h"
 #include "steering.h"
 
-#define DEMO 0
-#if DEMO
+#include "display.h"
+#include "input.h"
+
 #include "demo.h"
-#endif /* DEMO */
 
 /* Pin configuration */
-#define LED_SIZE 4
+/*#define LED_SIZE 4
 #define LED1 8
 #define LED2 9
 #define LED3 10
-#define LED4 11
+#define LED4 11*/
 
 #define SENSOR_SIZE 4
 #define SENSOR1 A0
@@ -84,16 +84,14 @@
 
 /* PID controller configuration */
 #define TARGET 0
-#define KP .005
-#define KI 0.0005
-#define KD .8
+#define KP 1
+#define KI 0
+#define KD 0
 
-/* TODO: if someone knows some macro tricks 
- * for repeating these I'd much appreciate it. */
-Led led1(LED1);
+/*Led led1(LED1);
 Led led2(LED2);
 Led led3(LED3);
-Led led4(LED4);
+Led led4(LED4);*/
 
 RawSensor raw1(SENSOR1);
 RawSensor raw2(SENSOR2);
@@ -165,22 +163,6 @@ void calibrationSequence() {
 	steering.stop();
 }
 
-void setupLineFollowing() {
-	manager.setCallback(&managerCb, nullptr);
-
-	Serial.println("Starting calibration sequence...");
-	calibrationSequence();	
-	Serial.println("Done calibration.");
-}
-
-void setup() {
-	Serial.begin(9600);
-	
-#if !DEMO
-	setupLineFollowing();
-#endif /* DEMO */
-}
-
 void managerCb(uint *values, uint size) {
 	int out = 0;
 
@@ -194,11 +176,94 @@ void managerCb(uint *values, uint size) {
 	steering.setTarget(out);
 }
 
+enum States {
+	STANDBY,
+	DEMO,
+	LINE_FOLLOWING
+};
+
+States state = STANDBY;
+
+void startCalibration() {
+	Serial.println("Starting calibration sequence...");
+	calibrationSequence();	
+	Serial.println("Done calibration.");
+}
+
+void startSettings() {
+	// TODO
+}
+
+void startDemo() {
+	state = DEMO;
+}
+
+void startLineFollowing() {
+	manager.setCallback(&managerCb, nullptr);
+	state = LINE_FOLLOWING;
+}
+
+char *startNames[4] = {
+	"CALIBR",
+	"SETTINGS",
+	"DEMO",
+	"START"
+};
+void (*startFuncs[4])() = {
+	startCalibration,
+	startSettings,
+	startDemo,
+	startLineFollowing
+};
+Menu start(startNames, startFuncs, 4);
+
+Menu *menu = &start;
+Display disp;
+
+void leftClick() {
+	menu->left();
+	disp.show(menu);
+}
+
+void rightClick() {
+	menu->right();
+	disp.show(menu);
+}
+
+void okClick() {
+	menu->execute();
+}
+
+ButtonConfig left(8, leftClick);
+ButtonConfig right(9, rightClick);
+ButtonConfig ok(10, okClick);
+ButtonConfig *btns[3] = { &left, &right, &ok };
+
+Input input(btns, 3);
+
+void setup() {
+	Serial.begin(9600);
+	disp.begin();
+
+	disp.show(menu);
+}
+
 void loop() {
-#if DEMO
-	demo(&led1, &led2, &led3, &led4, &leftMotor, &rightMotor, &steering);
-	Serial.println("demo mode");
-#else
-	manager.tick();
-#endif /* DEMO */
+	input.tick();
+
+	switch (state) {
+		case STANDBY:
+			Serial.println("STANDBY");
+			break;
+		case DEMO:
+			Serial.println("DEMO");
+			//demo(&led1, &led2, &led3, &led4, &leftMotor, &rightMotor, &steering);
+			break;
+		case LINE_FOLLOWING:
+			Serial.println("LINE FOLLOWING");
+			manager.tick();
+			break;
+		default:
+			break;
+	}
 }
