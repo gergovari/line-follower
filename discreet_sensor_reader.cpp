@@ -8,7 +8,7 @@ DiscreetSensorReader::DiscreetSensorReader(uint c) {
 }
 
 DiscreetSensorReader::~DiscreetSensorReader() {
-	free(reader);
+	delete reader;
 }
 
 void DiscreetSensorReader::calculate(uint *values, uint size, int *out) {

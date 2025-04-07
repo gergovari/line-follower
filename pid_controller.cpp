@@ -11,9 +11,9 @@ PIDController::PIDController(PIDParameters pa) {
 }
 
 PIDController::~PIDController() {
-	free(p);
-	free(i);
-	free(d);
+	delete p;
+	delete i;
+	delete d;
 }
 
 void PIDController::calculate(int in, int *out) {
