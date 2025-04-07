@@ -196,6 +196,25 @@ void (*setFuncs[1])() = {
 };
 Menu settings(setNames, setFuncs, 1);
 
+void followPauseResume() {
+	state = state == STANDBY ? LINE_FOLLOWING : STANDBY;
+}
+void followStop() {
+	state = STANDBY;
+	menuManager.back();
+	disp.show(menuManager.current);
+}
+
+char *followNames[2] = {
+	"PAUSE/RESUME",
+	"STOP"
+};
+void (*followFuncs[2])() = {
+	followPauseResume,
+	followStop
+};
+Menu follow(followNames, followFuncs, 2);
+
 void startCalibration() {
 	Serial.println("Starting calibration sequence...");
 	calibrationSequence();	
@@ -211,11 +230,13 @@ void startDemo() {
 void startLineFollowing() {
 	manager.setCallback(&managerCb, nullptr);
 	state = LINE_FOLLOWING;
+	menuManager.push(&follow);
+	disp.show(menuManager.current);
 }
 
 char *startNames[4] = {
 	"CALIBR",
-	"SETTINGS",
+	"CONFIG",
 	"DEMO",
 	"FOLLOW"
 };
@@ -226,6 +247,7 @@ void (*startFuncs[4])() = {
 	startLineFollowing
 };
 Menu start(startNames, startFuncs, 4);
+
 
 void leftClick() {
 	menuManager.current->left();
@@ -266,14 +288,15 @@ void loop() {
 
 	switch (state) {
 		case STANDBY:
-			//Serial.println("STANDBY");
+			Serial.println("STANDBY");
+			steering.stop();
 			break;
 		case DEMO:
-			//Serial.println("DEMO");
+			Serial.println("DEMO");
 			//demo(&led1, &led2, &led3, &led4, &leftMotor, &rightMotor, &steering);
 			break;
 		case LINE_FOLLOWING:
-			//Serial.println("LINE FOLLOWING");
+			Serial.println("LINE FOLLOWING");
 			manager.tick();
 			break;
 		default:
