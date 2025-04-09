@@ -48,6 +48,9 @@ void Display::show(Screen *screen) {
 		case ScreenType::POPUP:
 			show((Popup*)screen);
 			break;
+		case ScreenType::DOUBLE_INPUT:
+			show((DoubleInput*)screen);
+			break;
 		default:
 			return;
 	}
@@ -85,4 +88,16 @@ void Display::show(Popup *popup) {
 	write(0, 1, ">DISMISS");
 	lcd->setCursor(0, 1);
 	blink();
+}
+
+void Display::show(DoubleInput *input) {
+	char num[6+1];
+	char out[10+1];
+	
+	dtostrf(input->in, 6, 4, num);
+	//snprintf(num, sizeof(num), "%s:%s", input->name, num);
+
+	//Serial.println(num);
+
+	//write(0, 0, num);
 }

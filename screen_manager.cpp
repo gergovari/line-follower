@@ -37,3 +37,11 @@ void ScreenManager::right() {
 void ScreenManager::ok() {
 	current->ok(this);
 }
+
+void ScreenManager::doubleLeft() {
+	current->doubleLeft(this);
+}
+
+void ScreenManager::doubleRight() {
+	current->doubleRight(this);
+}

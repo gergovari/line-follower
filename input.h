@@ -8,9 +8,16 @@ class ButtonConfig {
 		Pin pin;
 		void (*click)();
 		void (*hold)();
+		void (*doubl)();
 		
-		ButtonConfig(Pin p, void (*c)(), void (*h)()) : pin(p), click(c), hold(h) {}
-		ButtonConfig(Pin p, void (*c)()) : pin(p), click(c), hold(nullptr) {}
+		ButtonConfig(Pin p, void (*c)(), void (*h)(), void (*d)()) 
+			: pin(p), click(c), hold(h), doubl(d) {}
+
+		ButtonConfig(Pin p, void (*c)(), void (*h)()) 
+			: pin(p), click(c), hold(h), doubl(nullptr) {}
+
+		ButtonConfig(Pin p, void (*c)()) 
+			: pin(p), click(c), hold(nullptr), doubl(nullptr) {}
 };
 
 class ConfiguredButton {

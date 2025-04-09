@@ -14,4 +14,7 @@ class Popup : public Screen {
 		void left(ScreenManager *manager) {};
 		void right(ScreenManager *manager) {};
 		void ok(ScreenManager *manager);
+
+		void doubleLeft(ScreenManager *manager) {};
+		void doubleRight(ScreenManager *manager) {};
 };

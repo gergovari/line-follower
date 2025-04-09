@@ -26,4 +26,7 @@ class ScreenManager {
 		void left();
 		void right();
 		void ok();
+
+		void doubleLeft();
+		void doubleRight();
 };

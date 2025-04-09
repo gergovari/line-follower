@@ -5,6 +5,7 @@
 #include "common.h"
 #include "menu.h"
 #include "popup.h"
+#include "double_input.h"
 
 class Display {
 	private:
@@ -23,4 +24,5 @@ class Display {
 		void show(Screen *screen);
 		void show(Menu *menu);
 		void show(Popup *popup);
+		void show(DoubleInput *input);
 };

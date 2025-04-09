@@ -185,15 +185,25 @@ States state = STANDBY;
 ScreenManager screenManager;
 Display disp;
 
+void pInSet(double in) {
+	Serial.print("pInSet: ");
+	Serial.println(in);
+}
+DoubleInput pInput("P", pInSet);
+
+void setPID() {
+	screenManager.push(&pInput);
+	disp.show(screenManager.current);
+}
 char *setNames[2] = {
 	"CALIBR",
 	"PID",
 };
 void (*setFuncs[2])() = {
 	nullptr,
-	nullptr
+	setPID
 };
-Menu settings(setNames, setFuncs, 1);
+Menu settings(setNames, setFuncs, 2);
 
 void followPauseResume() {
 	state = state == STANDBY ? LINE_FOLLOWING : STANDBY;
@@ -203,7 +213,6 @@ void followStop() {
 	screenManager.back();
 	disp.show(screenManager.current);
 }
-
 char *followNames[2] = {
 	"PAUSE/RESUME",
 	"STOP"
@@ -259,7 +268,6 @@ Menu calibration(calibrationNames, calibrationFuncs, 2);
 void demoOff() {
 	state = STANDBY;
 }
-
 Popup demoPopup("Demo mode on...", demoOff);
 
 void startCalibration() {
@@ -312,9 +320,17 @@ void okHold() {
 	screenManager.back();
 	disp.show(screenManager.current);
 }
+void doubleLeftClick() {
+	screenManager.doubleLeft();
+	disp.show(screenManager.current);
+}
+void doubleRightClick() {
+	screenManager.doubleRight();
+	disp.show(screenManager.current);
+}
 
-ButtonConfig left(8, leftClick);
-ButtonConfig right(9, rightClick);
+ButtonConfig left(8, leftClick, nullptr, doubleLeftClick);
+ButtonConfig right(9, rightClick, nullptr, doubleRightClick);
 ButtonConfig ok(10, okClick, okHold);
 ButtonConfig *btns[3] = { &left, &right, &ok };
 
@@ -333,19 +349,19 @@ void loop() {
 
 	switch (state) {
 		case STANDBY:
-			Serial.println("STANDBY");
+			//Serial.println("STANDBY");
 			steering.stop();
 			break;
 		case DEMO:
-			Serial.println("DEMO");
+			//Serial.println("DEMO");
 			//demo(&led1, &led2, &led3, &led4, &leftMotor, &rightMotor, &steering);
 			break;
 		case LINE_FOLLOWING:
-			Serial.println("LINE FOLLOWING");
+			//Serial.println("LINE FOLLOWING");
 			manager.tick();
 			break;
 		case CALIBRATION:
-			Serial.println("CALIBRATION");
+			//Serial.println("CALIBRATION");
 			calibrateSensors();
 			break;
 		default:

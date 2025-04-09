@@ -5,6 +5,7 @@ ConfiguredButton::ConfiguredButton(ButtonConfig c) {
 
 	btn->attachClick(c.click);
 	btn->attachLongPressStart(c.hold);
+	btn->attachDoubleClick(c.doubl);
 }
 
 ConfiguredButton::~ConfiguredButton() {
