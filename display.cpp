@@ -13,10 +13,12 @@ Display::~Display() {
 void Display::begin() {
 	lcd->init();
 	lcd->backlight();
-	lcd->clear();
+	clear();
 }
 
 void Display::clear() {
+	lcd->setCursor(0, 0);
+	blink(false);
 	lcd->clear();
 }
 
@@ -37,9 +39,22 @@ void Display::write(uint x, uint y, char *m) {
 	lcd->print(m);
 }
 
+void Display::show(Screen *screen) {
+	clear();
+	switch (screen->type) {
+		case ScreenType::MENU:
+			show((Menu*)screen);
+			break;
+		case ScreenType::POPUP:
+			show((Popup*)screen);
+			break;
+		default:
+			return;
+	}
+}
+
 void Display::show(Menu *menu) {
 	if (menu->size > 4) return;
-	lcd->clear();
 
 	for (uint i = 0; i < menu->size; i++) {
 		char *name = menu->names[i];
@@ -62,4 +77,12 @@ void Display::show(Menu *menu) {
 	uint y = i < 2 ? i : i - 2;
 	lcd->setCursor(x, y);
 	lcd->blink();
+}
+
+void Display::show(Popup *popup) {
+	// FIXME: unsafe I guess
+	write(0, 0, popup->msg);
+	write(0, 1, ">DISMISS");
+	lcd->setCursor(0, 1);
+	blink();
 }

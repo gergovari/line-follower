@@ -7,5 +7,5 @@ class Sensor {
 		uint lowest;
 		uint highest;
 
-		virtual uint get();
+		virtual uint get() = 0;
 };

@@ -2,43 +2,58 @@
 
 #include <Arduino.h>
 
-void Menu::left() {
+void Menu::left(ScreenManager *manager) {
 	selected = constrain(selected - 1, 0, size - 1);
 }
 
-void Menu::right() {
+void Menu::right(ScreenManager *manager) {
 	selected = constrain(selected + 1, 0, size - 1);
 }
 
-void Menu::execute() {
+void Menu::ok(ScreenManager *manager) {
 	auto func = funcs[constrain(selected, 0, size - 1)];
-	if (func) {
-		func();
-	}
+	if (func) func();
 }
 
-MenuManager::~MenuManager() {
-	MenuNode *node = previous;
+void Popup::ok(ScreenManager *manager) {
+	if (func) func();
+	manager->back();
+}
+
+ScreenManager::~ScreenManager() {
+	auto *node = previous;
 	while (node != nullptr) {
 		node = node->previous; 
 		delete previous;
 	}
 }
 
-void MenuManager::push(Menu *menu) {
-	previous = new MenuNode(previous, current);
+void ScreenManager::push(Screen *screen) {
+	previous = new ScreenNode(previous, current);
 	count++;
 
-	current = menu;
+	current = screen;
 }
 
-void MenuManager::back() {
+void ScreenManager::back() {
 	if (previous) {
-		current = previous->menu;
+		current = previous->screen;
 		
-		MenuNode *old = previous;
+		auto *old = previous;
 		previous = old->previous;
 		delete old;
 		count--;
 	}
+}
+
+void ScreenManager::left() {
+	current->left(this);
+}
+
+void ScreenManager::right() {
+	current->right(this);
+}
+
+void ScreenManager::ok() {
+	current->ok(this);
 }

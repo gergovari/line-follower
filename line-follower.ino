@@ -182,7 +182,7 @@ enum States {
 States state = STANDBY;
 
 
-MenuManager menuManager;
+ScreenManager screenManager;
 Display disp;
 
 char *setNames[2] = {
@@ -200,8 +200,8 @@ void followPauseResume() {
 }
 void followStop() {
 	state = STANDBY;
-	menuManager.back();
-	disp.show(menuManager.current);
+	screenManager.back();
+	disp.show(screenManager.current);
 }
 
 char *followNames[2] = {
@@ -239,11 +239,11 @@ void calibrationAutomatic() {
 	
 	calibrationSequence();
 
-	disp.show(menuManager.current);
+	disp.show(screenManager.current);
 }
 void calibrationManual() {
-	menuManager.push(&manual);
-	disp.show(menuManager.current);
+	screenManager.push(&manual);
+	disp.show(screenManager.current);
 }
 
 char *calibrationNames[2] = {
@@ -256,22 +256,30 @@ void (*calibrationFuncs[2])() = {
 };
 Menu calibration(calibrationNames, calibrationFuncs, 2);
 
+void demoOff() {
+	state = STANDBY;
+}
+
+Popup demoPopup("Demo mode on...", demoOff);
+
 void startCalibration() {
-	menuManager.push(&calibration);
-	disp.show(menuManager.current);
+	screenManager.push(&calibration);
+	disp.show(screenManager.current);
 }
 void startSettings() {
-	menuManager.push(&settings);
-	disp.show(menuManager.current);
+	screenManager.push(&settings);
+	disp.show(screenManager.current);
 }
 void startDemo() {
 	state = DEMO;
+	screenManager.push(&demoPopup);
+	disp.show(screenManager.current);
 }
 void startLineFollowing() {
 	manager.setCallback(&managerCb, nullptr);
 	state = LINE_FOLLOWING;
-	menuManager.push(&follow);
-	disp.show(menuManager.current);
+	screenManager.push(&follow);
+	disp.show(screenManager.current);
 }
 
 char *startNames[4] = {
@@ -289,19 +297,20 @@ void (*startFuncs[4])() = {
 Menu start(startNames, startFuncs, 4);
 
 void leftClick() {
-	menuManager.current->left();
-	disp.show(menuManager.current);
+	screenManager.left();
+	disp.show(screenManager.current);
 }
 void rightClick() {
-	menuManager.current->right();
-	disp.show(menuManager.current);
+	screenManager.right();
+	disp.show(screenManager.current);
 }
 void okClick() {
-	menuManager.current->execute();
+	screenManager.ok();
+	disp.show(screenManager.current);
 }
 void okHold() {
-	menuManager.back();
-	disp.show(menuManager.current);
+	screenManager.back();
+	disp.show(screenManager.current);
 }
 
 ButtonConfig left(8, leftClick);
@@ -315,8 +324,8 @@ void setup() {
 	Serial.begin(9600);
 	disp.begin();
 	
-	menuManager.current = &start;
-	disp.show(menuManager.current);
+	screenManager.current = &start;
+	disp.show(screenManager.current);
 }
 
 void loop() {

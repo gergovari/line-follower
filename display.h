@@ -3,10 +3,9 @@
 #include <LiquidCrystal_I2C.h>
 
 #include "common.h"
-#include "menu_consumer.h"
 #include "menu.h"
 
-class Display : public MenuConsumer {
+class Display {
 	private:
 		LiquidCrystal_I2C *lcd;
 
@@ -20,5 +19,7 @@ class Display : public MenuConsumer {
 		void blink();
 		void write(uint x, uint y, char *m);
 
+		void show(Screen *screen);
 		void show(Menu *menu);
+		void show(Popup *popup);
 };
