@@ -4,6 +4,7 @@
 
 #include "common.h"
 #include "menu.h"
+#include "popup.h"
 
 class Display {
 	private:
