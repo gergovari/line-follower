@@ -91,13 +91,4 @@ void Display::show(Popup *popup) {
 }
 
 void Display::show(DoubleInput *input) {
-	char num[6+1];
-	char out[10+1];
-	
-	dtostrf(input->in, 6, 4, num);
-	//snprintf(num, sizeof(num), "%s:%s", input->name, num);
-
-	//Serial.println(num);
-
-	//write(0, 0, num);
 }

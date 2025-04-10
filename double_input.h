@@ -6,15 +6,20 @@
 #include "screen_manager.h"
 
 class DoubleInput : public Screen {
+	private:
+		void addTo(int amount);
+		int ipow(int base, int exponent);
 	public:
-		double in = 0;
+		int whole = 0;
+		int fraction = 0;
+		int exponent = 0;
+
 		uint selected = 0;
 		
 		char *name;
 		void (*cb)(double in);
 
-		DoubleInput(char *n, void (*c)(), double s) 
-			: Screen(ScreenType::DOUBLE_INPUT), name(n), cb(c), in(s) {};
+		DoubleInput(char *n, void (*c)(), double start);
 		DoubleInput(char *n, void (*c)()) 
 			: Screen(ScreenType::DOUBLE_INPUT), name(n), cb(c) {};
 
