@@ -30,8 +30,21 @@ void DoubleInput::addTo(int amount) {
 	if (selected == 0) {
 		whole = constrain(whole + amount, 1, 9);
 	} else if (selected < 5) {
+		int temp = fraction;
+		for (int i = 1; i < 5; i++) {
+			if (i == selected) {
+				continue;
+			}
+			
+			int n = (temp / ipow(10, 4 - i));
+			if (n < 10) {
+				temp -= n * ipow(10, 4 - i);
+			}
+		}
+		temp /= ipow(10, 4 - selected);
+
 		int multiplier = ipow(10, 4 - selected);
-		if (fraction < multiplier * 9) { // TODO: bad
+		if ((amount > 0 && temp < 9) || (amount < 0 && temp > 0)) {
 			fraction += amount * multiplier;
 		}
 	} else {
