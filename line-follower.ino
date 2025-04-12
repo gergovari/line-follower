@@ -194,21 +194,21 @@ void pInSet(double in) {
 	config.save();
 	config.apply(&controller);
 }
-DoubleInput pInput("Proportional", pInSet);
+DoubleInput pInput("Proportional", pInSet, KP);
 
 void iInSet(double in) {
 	config.i = in;
 	config.save();
 	config.apply(&controller);
 }
-DoubleInput iInput("Integrate", dInSet);
+DoubleInput iInput("Integrate", iInSet, KI);
 
 void dInSet(double in) {
 	config.d = in;
 	config.save();
 	config.apply(&controller);
 }
-DoubleInput dInput("Derivate", dInSet);
+DoubleInput dInput("Derivate", dInSet, KD);
 
 void pidP() {
 	screenManager.push(&pInput);

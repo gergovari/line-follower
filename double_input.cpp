@@ -32,7 +32,7 @@ int DoubleInput::ipow(int base, int exp)
 
 void DoubleInput::addTo(int amount) {
 	if (selected == 0) {
-		whole = constrain(whole + amount, 1, 9);
+		whole = constrain(whole + amount, 0, 9);
 	} else if (selected < 5) {
 		int temp = fraction;
 		for (int i = 1; i < 5; i++) {

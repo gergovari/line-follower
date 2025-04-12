@@ -15,5 +15,4 @@ void DiscreetSensorReader::calculate(uint *values, uint size, int *out) {
 	reader->calculate(values, size, out);
 	
 	(*out) = abs(*out) < cutoff ? 0 : (*out);
-	Serial.println(*out);
 }
