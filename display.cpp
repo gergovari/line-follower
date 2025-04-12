@@ -91,4 +91,27 @@ void Display::show(Popup *popup) {
 }
 
 void Display::show(DoubleInput *input) {
+	uint size = strlen(input->name) + 2;
+	char name[size];
+	char output[10];
+	
+	snprintf(name, size, "%s:", input->name);
+	snprintf(output, 10, "%1d.%04dE%+2d",
+			input->whole, 
+			input->fraction,
+			input->exponent
+		);
+	
+	write(0, 0, name);
+	write(0, 1, output);
+	
+	if (input->selected == 0) {
+		lcd->setCursor(0, 1);
+	} else if (input->selected > 0 && input->selected < 5) {
+		lcd->setCursor(1 + input->selected, 1);
+	} else if (input->selected > 4) {
+		lcd->setCursor(8, 1);
+	}
+
+	blink();
 }
