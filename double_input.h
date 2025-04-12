@@ -10,7 +10,7 @@ class DoubleInput : public Screen {
 		void addTo(int amount);
 		int ipow(int base, int exponent);
 	public:
-		int whole = 0;
+		int whole = 1;
 		int fraction = 0;
 		int exponent = 0;
 

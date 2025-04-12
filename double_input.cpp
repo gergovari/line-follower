@@ -68,7 +68,7 @@ void DoubleInput::right(ScreenManager *manager) {
 
 void DoubleInput::ok(ScreenManager *manager) {
 	if (cb) {
-		cb(whole + (double)fraction / pow(10, exponent));
+		cb((whole + (double)fraction / pow(10, 4)) * pow(10, exponent));
 	}
 }
 
