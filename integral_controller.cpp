@@ -12,6 +12,6 @@ void IntegralController::calculate(int in, int *out) {
 
 	previous = current;
 
-	cumulative = constrain(cumulative + in * elapsed, lowest, highest);
+	cumulative = cumulative + in * elapsed;
 	(*out) = constrain(ki * cumulative, lowest, highest);
 }
