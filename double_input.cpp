@@ -4,9 +4,13 @@
 
 DoubleInput::DoubleInput(char *n, void (*c)(), double start) 
 	: Screen(ScreenType::DOUBLE_INPUT), name(n), cb(c) {
-		whole = (int)start;
-		fraction = (int)((start - whole) * pow(10, 4));
+	set(start);
 };
+
+void DoubleInput::set(double val) {
+	whole = (int)val;
+	fraction = (int)((val - whole) * pow(10, 4));
+}
 
 /* Who knew pow uses floats 
  * and it's not precise when converted to an int... */
@@ -50,12 +54,6 @@ void DoubleInput::addTo(int amount) {
 	} else {
 		exponent = constrain(exponent + amount, -9, 9);
 	}
-
-	Serial.print(whole);
-	Serial.print(".");
-	Serial.print(fraction);
-	Serial.print("E");
-	Serial.println(exponent);
 }
 
 void DoubleInput::left(ScreenManager *manager) {
@@ -70,16 +68,13 @@ void DoubleInput::ok(ScreenManager *manager) {
 	if (cb) {
 		cb((whole + (double)fraction / pow(10, 4)) * pow(10, exponent));
 	}
+	manager->back();
 }
 
 void DoubleInput::doubleLeft(ScreenManager *manager) {
 	selected = constrain(selected - 1, 0, 5);
-	Serial.print("left, selected: ");
-	Serial.println(selected);
 }
 
 void DoubleInput::doubleRight(ScreenManager *manager) {
 	selected = constrain(selected + 1, 0, 5);
-	Serial.print("right, selected: ");
-	Serial.println(selected);
 }

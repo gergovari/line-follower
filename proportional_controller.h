@@ -4,10 +4,8 @@
 #include "controller.h"
 
 class ProportionalController : public Controller {
-	private:
-		int target = 0;
-
 	public:
+		int target = 0;
 		double kp = 1;
 
 		ProportionalController(int t, double p);

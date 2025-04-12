@@ -22,12 +22,11 @@ class PIDController : public Controller {
 	private:
 		long previous = 0;
 		int last = 0;
-
+	public:
 		ProportionalController *p;
 		IntegralController *i;
 		DerivateController *d;
 
-	public:
 		PIDParameters parameters;
 
 		PIDController(PIDParameters pa);

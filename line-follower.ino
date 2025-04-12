@@ -18,6 +18,8 @@
 #include "motor.h"
 #include "steering.h"
 
+#include "configuration.h"
+
 #include "display.h"
 #include "input.h"
 
@@ -181,29 +183,74 @@ enum States {
 
 States state = STANDBY;
 
-
 ScreenManager screenManager;
 Display disp;
 
-void pInSet(double in) {
-	Serial.print("pInSet: ");
-	Serial.println(in);
-}
-DoubleInput pInput("P", pInSet);
+#if CONTROLLER == 3
+Configuration config(TARGET, KP, KI, KD);
 
-void setPID() {
+void pInSet(double in) {
+	config.p = in;
+	config.save();
+	config.apply(&controller);
+}
+DoubleInput pInput("Proportional", pInSet);
+
+void iInSet(double in) {
+	config.i = in;
+	config.save();
+	config.apply(&controller);
+}
+DoubleInput iInput("Integrate", dInSet);
+
+void dInSet(double in) {
+	config.d = in;
+	config.save();
+	config.apply(&controller);
+}
+DoubleInput dInput("Derivate", dInSet);
+
+void pidP() {
 	screenManager.push(&pInput);
 	disp.show(screenManager.current);
 }
-char *setNames[2] = {
-	"CALIBR",
+void pidI() {
+	screenManager.push(&iInput);
+	disp.show(screenManager.current);
+}
+void pidD() {
+	screenManager.push(&dInput);
+	disp.show(screenManager.current);
+}
+
+char *pidNames[3] = {
+	"P",
+	"I",
+	"D"
+};
+void (*pidFuncs[3])() = {
+	pidP,
+	pidI,
+	pidD
+};
+Menu pid(pidNames, pidFuncs, 3);
+
+void setPID() {
+	screenManager.push(&pid);
+	disp.show(screenManager.current);
+}
+char *setNames[1] = {
 	"PID",
 };
-void (*setFuncs[2])() = {
-	nullptr,
+void (*setFuncs[1])() = {
 	setPID
 };
-Menu settings(setNames, setFuncs, 2);
+Menu settings(setNames, setFuncs, 1);
+#else
+char *setNames[0] = {};
+void (*setFuncs[0])() = {};
+Menu settings(setNames, setFuncs, 0);
+#endif
 
 void followPauseResume() {
 	state = state == STANDBY ? LINE_FOLLOWING : STANDBY;

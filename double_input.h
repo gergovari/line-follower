@@ -22,6 +22,8 @@ class DoubleInput : public Screen {
 		DoubleInput(char *n, void (*c)(), double start);
 		DoubleInput(char *n, void (*c)()) 
 			: Screen(ScreenType::DOUBLE_INPUT), name(n), cb(c) {};
+		
+		void set(double val);
 
 		void left(ScreenManager *manager);
 		void right(ScreenManager *manager);
