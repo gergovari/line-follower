@@ -1,5 +1,9 @@
 #pragma once
 
+#include "led.h"
+#include "motor.h"
+#include "steering.h"
+
 #include <Arduino.h>
 
 void test_leds(Led *led1, Led *led2, Led *led3, Led *led4) {
@@ -21,6 +25,7 @@ void test_leds(Led *led1, Led *led2, Led *led3, Led *led4) {
 	led4->set(true);
 	delay(500);
 }
+
 void test_motors(Motor *left, Motor *right) {
 	left->setSpeed(1000);
 	right->setSpeed(1000);
@@ -38,6 +43,7 @@ void test_motors(Motor *left, Motor *right) {
 	right->setSpeed(0);
 	delay(1000);
 }
+
 void test_steering(Steering *steering) {
 	steering->setTarget(0);
 	delay(2000);
@@ -52,12 +58,14 @@ void test_steering(Steering *steering) {
 	steering->stop();
 	delay(1000);
 }
-void demo(
-	Led *led1, Led *led2, Led *led3, Led *led4, 
-	Motor *left, Motor *right, 
-	Steering *steering) 
+
+void demo(LineFollower *follower) 
 {
-	test_leds(led1, led2, led3, led4);
+	auto left = follower->motors->left;
+	auto right = follower->motors->right;
+	auto steering = follower->steering;
+
+	//test_leds(led1, led2, led3, led4);
 	test_motors(left, right);
 	test_steering(steering);
 }
