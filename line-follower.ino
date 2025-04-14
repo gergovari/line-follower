@@ -228,10 +228,7 @@ void (*calibrationFuncs[2])() = {
 };
 Menu calibration(calibrationNames, calibrationFuncs, 2);
 
-void demoOff() {
-	state = STANDBY;
-}
-Popup demoPopup("Demo mode on...", demoOff);
+Popup demoPopup("Demo mode on...");
 
 void startCalibration() {
 	screenManager.push(&calibration);
@@ -314,6 +311,7 @@ void runState() {
 			break;
 		case DEMO:
 			follower.run(demo);
+			state = STANDBY;
 			break;
 		case LINE_FOLLOWING:
 			follower.state = LineFollowerStates::FOLLOW;
