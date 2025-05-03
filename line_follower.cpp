@@ -1,5 +1,7 @@
 #include "line_follower.h"
 
+#include <Arduino.h>
+
 LineFollower::LineFollower(SensorArray *s, SensorReader *r, SensorManager *m, Steering *st) 
 	: sensors(s), reader(r), manager(m), steering(st) {
 	steering->stop();
@@ -44,5 +46,7 @@ static void LineFollower::managerCb(uint *values, uint size, void *user) {
 		reader->calculate(values, size, &out);
 		controller->calculate(out, &out);
 	}
+
+	Serial.println(out);
 	steering->setTarget(out);
 }

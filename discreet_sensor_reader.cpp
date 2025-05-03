@@ -14,5 +14,5 @@ DiscreetSensorReader::~DiscreetSensorReader() {
 void DiscreetSensorReader::calculate(uint *values, uint size, int *out) {
 	reader->calculate(values, size, out);
 	
-	(*out) = abs(*out) < cutoff ? 0 : (*out);
+	(*out) = abs(*out) < cutoff ? 0 : ((*out) > 0 ? highest : lowest) ;
 }

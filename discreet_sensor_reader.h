@@ -6,10 +6,11 @@
 
 class DiscreetSensorReader : public SensorReader {
 	private:
-		uint cutoff = 0;
 		SymmetricSensorReader *reader;
 
 	public:
+		uint cutoff = 0;
+
 		DiscreetSensorReader(uint c);
 		~DiscreetSensorReader();
 

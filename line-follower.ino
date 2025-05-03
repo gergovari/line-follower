@@ -10,8 +10,8 @@
 #include "calibrated_sensor_array.h"
 #include "sensor_manager.h"
 
-#include "symmetric_sensor_reader.h"
 #include "discreet_sensor_reader.h"
+#include "memory_sensor_reader.h"
 
 #include "bang_raw_controller.h"
 #include "bang_controller.h"
@@ -54,7 +54,8 @@ SensorArray sensorArray(sensors, SENSOR_SIZE);
 
 SensorManager manager(sensors, SENSOR_SIZE);
 
-DiscreetSensorReader reader(CUTOFF);
+DiscreetSensorReader discreetReader(CUTOFF);
+MemorySensorReader reader(&discreetReader);
 
 PIDParameters parameters(TARGET, KP, KI, KD);
 PIDController controller(parameters);
