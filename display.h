@@ -7,6 +7,10 @@
 #include "popup.h"
 #include "double_input.h"
 
+class Menu;
+class Popup;
+class DoubleInput;
+
 class Display {
 	private:
 		LiquidCrystal_I2C *lcd;

@@ -82,8 +82,8 @@ enum States {
 };
 States state = STANDBY;
 
-ScreenManager screenManager;
 Display disp;
+ScreenManager screenManager(&disp);
 
 Configuration config(TARGET, KP, KI, KD);
 
@@ -110,15 +110,12 @@ DoubleInput dInput("Derivate", dInSet, KD);
 
 void pidP() {
 	screenManager.push(&pInput);
-	disp.show(screenManager.current);
 }
 void pidI() {
 	screenManager.push(&iInput);
-	disp.show(screenManager.current);
 }
 void pidD() {
 	screenManager.push(&dInput);
-	disp.show(screenManager.current);
 }
 
 char *pidNames[3] = {
@@ -135,7 +132,6 @@ Menu pid(pidNames, pidFuncs, 3);
 
 void setPID() {
 	screenManager.push(&pid);
-	disp.show(screenManager.current);
 }
 char *setNames[1] = {
 	"PID",
@@ -151,7 +147,6 @@ void followPauseResume() {
 void followStop() {
 	state = STANDBY;
 	screenManager.back();
-	disp.show(screenManager.current);
 }
 char *followNames[2] = {
 	"PAUSE/RESUME",
@@ -169,7 +164,6 @@ void manualStart() {
 void manualStop() {
 	state = STANDBY;
 	screenManager.back();
-	disp.show(screenManager.current);
 }
 
 char *manualNames[2] = {
@@ -207,12 +201,9 @@ void calibrationAutomatic() {
 			delay(2000);
 		}
 	});
-
-	disp.show(screenManager.current);
 }
 void calibrationManual() {
 	screenManager.push(&manual);
-	disp.show(screenManager.current);
 }
 
 char *calibrationNames[2] = {
@@ -229,21 +220,17 @@ Popup demoPopup("Demo mode on...");
 
 void startCalibration() {
 	screenManager.push(&calibration);
-	disp.show(screenManager.current);
 }
 void startSettings() {
 	screenManager.push(&settings);
-	disp.show(screenManager.current);
 }
 void startDemo() {
 	state = DEMO;
 	screenManager.push(&demoPopup);
-	disp.show(screenManager.current);
 }
 void startLineFollowing() {
 	state = LINE_FOLLOWING;
 	screenManager.push(&follow);
-	disp.show(screenManager.current);
 }
 
 char *startNames[4] = {
@@ -262,27 +249,21 @@ Menu start(startNames, startFuncs, 4);
 
 void leftClick() {
 	screenManager.left();
-	disp.show(screenManager.current);
 }
 void rightClick() {
 	screenManager.right();
-	disp.show(screenManager.current);
 }
 void okClick() {
 	screenManager.ok();
-	disp.show(screenManager.current);
 }
 void okHold() {
 	screenManager.back();
-	disp.show(screenManager.current);
 }
 void doubleLeftClick() {
 	screenManager.doubleLeft();
-	disp.show(screenManager.current);
 }
 void doubleRightClick() {
 	screenManager.doubleRight();
-	disp.show(screenManager.current);
 }
 
 ButtonConfig left(LEFT, leftClick, nullptr, doubleLeftClick);
@@ -296,6 +277,8 @@ void setup() {
 	Serial.begin(9600);
 	disp.begin();
 	
+	/* We don't do this in an initalizer 
+	 * as we need to begin the display here... */
 	screenManager.current = &start;
 	disp.show(screenManager.current);
 }
