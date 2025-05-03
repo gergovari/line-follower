@@ -10,6 +10,8 @@
 #include "motor_pair.h"
 #include "steering.h"
 
+#include "calibrated_sensor_array.h"
+
 class LineFollower;
 
 typedef void *(Sequence)(LineFollower*);
@@ -22,6 +24,7 @@ enum class LineFollowerStates {
 class LineFollower {
 	private:
 		LineFollower(SensorArray *s, SensorReader *r, SensorManager *m, MotorPair *mp, Steering *st);
+		LineFollower(SensorArray *s, SensorReader *r, SensorManager *m, MotorPair *mp, Steering *st, CalibratedSensorArray *cs);
 	public:
 		RawController *rawController = nullptr;
 		Controller *controller = nullptr;
@@ -34,6 +37,8 @@ class LineFollower {
 		Steering *steering;
 
 		LineFollowerStates state;
+
+		CalibratedSensorArray *calibratedSensors;
 		
 		LineFollower(RawController *c, 
 			SensorArray *s, 
@@ -51,6 +56,25 @@ class LineFollower {
 			SensorManager *m, 
 			MotorPair *mp, 
 			Steering *st) : LineFollower(s, r, m, mp, st) {
+			controller = c;
+		};
+
+		LineFollower(RawController *c, 
+			SensorArray *s, 
+			SensorReader *r, 
+			SensorManager *m, 
+			MotorPair *mp, 
+			Steering *st,
+			CalibratedSensorArray *cs) : LineFollower(s, r, m, mp, st, cs) {
+			rawController = c;
+		};
+		LineFollower(Controller *c, 
+			SensorArray *s, 
+			SensorReader *r, 
+			SensorManager *m, 
+			MotorPair *mp, 
+			Steering *st,
+			CalibratedSensorArray *cs) : LineFollower(s, r, m, mp, st, cs) {
 			controller = c;
 		};
 

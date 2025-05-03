@@ -21,14 +21,12 @@
 #include "steering.h"
 
 #include "line_follower.h"
+#include "demo.h"
 
 #include "configuration.h"
 
 #include "display.h"
 #include "input.h"
-
-#include "demo.h"
-
 
 #include "pin_conf.h"
 #include "conf.h"
@@ -38,48 +36,28 @@ RawSensor raw2(SENSOR2);
 RawSensor raw3(SENSOR3);
 RawSensor raw4(SENSOR4);
 
-#if SENSOR == 1 || SENSOR == 2
 CalibratedSensor calibrated1(&raw1, REVERSED);
 CalibratedSensor calibrated2(&raw2, REVERSED);
 CalibratedSensor calibrated3(&raw3, REVERSED);
 CalibratedSensor calibrated4(&raw4, REVERSED);
 CalibratedSensor *calibratedSensors[SENSOR_SIZE] = 
 	{ &calibrated1, &calibrated2, &calibrated3, &calibrated4 };
-#endif /* SENSOR */
+CalibratedSensorArray calibratedSensorArray(calibratedSensors, SENSOR_SIZE);
 
-#if SENSOR == 2
 DiscreetSensor discreet1(&calibrated1, THRESHOLD);
 DiscreetSensor discreet2(&calibrated2, THRESHOLD);
 DiscreetSensor discreet3(&calibrated3, THRESHOLD);
 DiscreetSensor discreet4(&calibrated4, THRESHOLD);
-#endif /* SENSOR */
 
-#if SENSOR == 1
-Sensor *sensors[SENSOR_SIZE] = { &calibrated1, &calibrated2, &calibrated3, &calibrated4 };
-#elif SENSOR == 2
-//Sensor *sensors[SENSOR_SIZE] = { &discreet1, &discreet2, &discreet3, &discreet4 };
 Sensor *sensors[SENSOR_SIZE] = { &discreet1, &discreet2, &discreet3, &discreet4 };
-#else
-Sensor *sensors[SENSOR_SIZE] = { &raw1, &raw2, &raw3, &raw4 };
-#endif /* SENSOR */
-CalibratedSensorArray sensorArray((Sensor*)sensors, SENSOR_SIZE);
+SensorArray sensorArray(sensors, SENSOR_SIZE);
 
 SensorManager manager(sensors, SENSOR_SIZE);
 
-#if READER == 1
-SymmetricSensorReader reader;
-#else
 DiscreetSensorReader reader(CUTOFF);
-#endif /* READER */
 
-#if CONTROLLER == 1
-BangRawController rawController(false);
-#elif CONTROLLER == 2
-BangController controller;
-#else
 PIDParameters parameters(TARGET, KP, KI, KD);
 PIDController controller(parameters);
-#endif /* CONTROLLER */
 
 Motor leftMotor(LFORW, LBACK, LSPEED);
 Motor rightMotor(RFORW, RBACK, RSPEED);
@@ -87,7 +65,13 @@ MotorPair motors(&leftMotor, &rightMotor);
 
 Steering steering(&leftMotor, &rightMotor);
 
-LineFollower follower(&controller, &sensorArray, &reader, &manager, &motors, &steering);
+LineFollower follower(&controller, 
+		&sensorArray, 
+		&reader, 
+		&manager, 
+		&motors, 
+		&steering,
+		&calibratedSensorArray);
 
 
 enum States {
@@ -101,7 +85,6 @@ States state = STANDBY;
 ScreenManager screenManager;
 Display disp;
 
-#if CONTROLLER == 3
 Configuration config(TARGET, KP, KI, KD);
 
 void pInSet(double in) {
@@ -161,11 +144,6 @@ void (*setFuncs[1])() = {
 	setPID
 };
 Menu settings(setNames, setFuncs, 1);
-#else
-char *setNames[0] = {};
-void (*setFuncs[0])() = {};
-Menu settings(setNames, setFuncs, 0);
-#endif
 
 void followPauseResume() {
 	state = state == STANDBY ? LINE_FOLLOWING : STANDBY;
@@ -190,6 +168,8 @@ void manualStart() {
 }
 void manualStop() {
 	state = STANDBY;
+	screenManager.back();
+	disp.show(screenManager.current);
 }
 
 char *manualNames[2] = {
@@ -208,8 +188,25 @@ void calibrationAutomatic() {
 	disp.write(0, 1, "started...");
 	disp.blink();
 	
-	// TODO
-	//calibrationSequence();
+	follower.run([](auto *follower) {
+		long time = CALIBRATION_SECS * SECOND;
+		auto *steering = follower->steering;
+		auto *sensors = follower->calibratedSensors;
+		
+		if (sensors) {
+			steering->setTarget(-1000);
+			for(long start = millis(); millis() - start < time;) {
+				sensors->calibrate();
+			}
+			steering->stop();
+		} else {
+			disp.clear();
+			disp.write(0, 0, "Failed");
+			disp.write(0, 1, "calibration...");
+			disp.blink();
+			delay(2000);
+		}
+	});
 
 	disp.show(screenManager.current);
 }
@@ -317,19 +314,10 @@ void runState() {
 			follower.state = LineFollowerStates::FOLLOW;
 			break;
 		case CALIBRATION:
-			follower.run([](auto *follower) {
-				long time = CALIBRATION_SECS * SECOND;
-				auto *steering = follower->steering;
-				auto *sensors = follower->sensors;
-
-				if (sensors->calibrated) {
-					steering->setTarget(-1000);
-					for(long start = millis(); millis() - start < time;) {
-						((CalibratedSensorArray*)(sensors))->calibrate();
-					}
-					steering->stop();
-				}
-			});
+			auto *sensors = follower.calibratedSensors;
+			if (sensors) {
+				sensors->calibrate();
+			}
 			break;
 	}
 }

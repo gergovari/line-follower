@@ -1,14 +1,17 @@
 #pragma once
 
-#include "sensor_array.h"
+#include <stddef.h>
+
 #include "calibrated_sensor.h"
 
-class CalibratedSensorArray : public SensorArray {
+class CalibratedSensorArray {
 	public:
 		bool calibrated = true;
-		CalibratedSensor *sensors;
+		size_t size;
 
-		CalibratedSensorArray(Sensor *s, size_t si) : SensorArray(s, si) {};
+		CalibratedSensor **sensors;
+
+		CalibratedSensorArray(CalibratedSensor **s, size_t si) : sensors(s), size(si) {};
 
 		void calibrate();
 };

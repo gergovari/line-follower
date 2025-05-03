@@ -6,11 +6,11 @@
 
 class SensorArray {
 	public:
-		Sensor *sensors;
+		Sensor **sensors;
 		size_t size;
 
 		// Sorry, no RTTI on Arduino...
 		bool calibrated = false;
 
-		SensorArray(Sensor *s, size_t si) : sensors(s), size(si) {};
+		SensorArray(Sensor **s, size_t si) : sensors(s), size(si) {};
 };

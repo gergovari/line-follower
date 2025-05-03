@@ -26,4 +26,5 @@ void PIDController::calculate(int in, int *out) {
 	if (d->kd != 0) d->calculate(pE, &dE);
 
 	(*out) = constrain(pE + iE + dE, lowest, highest);
+	Serial.println(*out);
 }

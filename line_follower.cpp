@@ -7,6 +7,11 @@ LineFollower::LineFollower(SensorArray *s, SensorReader *r, SensorManager *m, Mo
 	manager->setCallback(LineFollower::managerCb, this);
 }
 
+LineFollower::LineFollower(SensorArray *s, SensorReader *r, SensorManager *m, MotorPair *mp, Steering *st, CalibratedSensorArray *cs) 
+	: LineFollower(s, r, m, mp, st) {
+	calibratedSensors = cs;
+}
+
 void LineFollower::tick() {
 	switch (state) {
 		case LineFollowerStates::STANDBY:
