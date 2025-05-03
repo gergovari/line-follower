@@ -23,8 +23,8 @@ enum class LineFollowerStates {
 
 class LineFollower {
 	private:
-		LineFollower(SensorArray *s, SensorReader *r, SensorManager *m, MotorPair *mp, Steering *st);
-		LineFollower(SensorArray *s, SensorReader *r, SensorManager *m, MotorPair *mp, Steering *st, CalibratedSensorArray *cs);
+		LineFollower(SensorArray *s, SensorReader *r, SensorManager *m, Steering *st);
+		LineFollower(SensorArray *s, SensorReader *r, SensorManager *m, Steering *st, CalibratedSensorArray *cs);
 	public:
 		RawController *rawController = nullptr;
 		Controller *controller = nullptr;
@@ -33,7 +33,6 @@ class LineFollower {
 		SensorReader *reader;
 		SensorManager *manager;
 		
-		MotorPair *motors;
 		Steering *steering;
 
 		LineFollowerStates state;
@@ -44,8 +43,7 @@ class LineFollower {
 			SensorArray *s, 
 			SensorReader *r, 
 			SensorManager *m, 
-			MotorPair *mp, 
-			Steering *st) : LineFollower(s, r, m, mp, st) {
+			Steering *st) : LineFollower(s, r, m, st) {
 			/* Dumb limitation requires this workaround...
 			 * Probably there's a reason but I don't get it. */
 			rawController = c;
@@ -54,8 +52,7 @@ class LineFollower {
 			SensorArray *s, 
 			SensorReader *r, 
 			SensorManager *m, 
-			MotorPair *mp, 
-			Steering *st) : LineFollower(s, r, m, mp, st) {
+			Steering *st) : LineFollower(s, r, m, st) {
 			controller = c;
 		};
 
@@ -63,18 +60,16 @@ class LineFollower {
 			SensorArray *s, 
 			SensorReader *r, 
 			SensorManager *m, 
-			MotorPair *mp, 
 			Steering *st,
-			CalibratedSensorArray *cs) : LineFollower(s, r, m, mp, st, cs) {
+			CalibratedSensorArray *cs) : LineFollower(s, r, m, st, cs) {
 			rawController = c;
 		};
 		LineFollower(Controller *c, 
 			SensorArray *s, 
 			SensorReader *r, 
 			SensorManager *m, 
-			MotorPair *mp, 
 			Steering *st,
-			CalibratedSensorArray *cs) : LineFollower(s, r, m, mp, st, cs) {
+			CalibratedSensorArray *cs) : LineFollower(s, r, m, st, cs) {
 			controller = c;
 		};
 

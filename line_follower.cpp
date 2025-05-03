@@ -1,14 +1,14 @@
 #include "line_follower.h"
 
-LineFollower::LineFollower(SensorArray *s, SensorReader *r, SensorManager *m, MotorPair *mp, Steering *st) 
-	: sensors(s), reader(r), manager(m), motors(mp), steering(st) {
+LineFollower::LineFollower(SensorArray *s, SensorReader *r, SensorManager *m, Steering *st) 
+	: sensors(s), reader(r), manager(m), steering(st) {
 	steering->stop();
 
 	manager->setCallback(LineFollower::managerCb, this);
 }
 
-LineFollower::LineFollower(SensorArray *s, SensorReader *r, SensorManager *m, MotorPair *mp, Steering *st, CalibratedSensorArray *cs) 
-	: LineFollower(s, r, m, mp, st) {
+LineFollower::LineFollower(SensorArray *s, SensorReader *r, SensorManager *m, Steering *st, CalibratedSensorArray *cs) 
+	: LineFollower(s, r, m, st) {
 	calibratedSensors = cs;
 }
 

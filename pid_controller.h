@@ -3,9 +3,6 @@
 #include "common.h"
 #include "controller.h"
 
-#include "proportional_controller.h"
-#include "integral_controller.h"
-#include "derivate_controller.h"
 
 struct PIDParameters {
 	int target = 0;
@@ -20,17 +17,15 @@ struct PIDParameters {
 
 class PIDController : public Controller {
 	private:
-		long previous = 0;
-		int last = 0;
-	public:
-		ProportionalController *p;
-		IntegralController *i;
-		DerivateController *d;
+		unsigned long lastTime;
 
+		long errorSum;
+		int lastError;
+
+	public:
 		PIDParameters parameters;
 
-		PIDController(PIDParameters pa);
-		~PIDController();
+		PIDController::PIDController(PIDParameters pa) : parameters(pa) {};
 
 		void calculate(int in, int *out);
 };

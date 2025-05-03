@@ -63,13 +63,12 @@ Motor leftMotor(LFORW, LBACK, LSPEED);
 Motor rightMotor(RFORW, RBACK, RSPEED);
 MotorPair motors(&leftMotor, &rightMotor);
 
-Steering steering(&leftMotor, &rightMotor);
+Steering steering(&motors);
 
 LineFollower follower(&controller, 
 		&sensorArray, 
 		&reader, 
 		&manager, 
-		&motors, 
 		&steering,
 		&calibratedSensorArray);
 

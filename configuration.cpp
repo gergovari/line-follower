@@ -12,8 +12,10 @@ void Configuration::load() {
 void Configuration::save() {}
 
 void Configuration::apply(PIDController *pid) {
-	pid->p->kp = p;
-	pid->p->target = target;
-	pid->i->ki = i;
-	pid->d->kd = d;
+	auto *parameters = &pid->parameters;
+
+	parameters->target = target;
+	parameters->kp = p;
+	parameters->ki = i;
+	parameters->kd = d;
 }

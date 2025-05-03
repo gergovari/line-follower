@@ -2,29 +2,25 @@
 
 #include <Arduino.h>
 
-PIDController::PIDController(PIDParameters pa) {
-	parameters = pa;
-
-	p = new ProportionalController(parameters.target, parameters.kp);
-	i = new IntegralController(parameters.ki);
-	d = new DerivateController(parameters.kd);
-}
-
-PIDController::~PIDController() {
-	delete p;
-	delete i;
-	delete d;
-}
-
 void PIDController::calculate(int in, int *out) {
-	int pE = 0;
-	int iE = 0;
-	int dE = 0;
+	unsigned long now = millis();
+	unsigned long deltaTime = (double)(now - lastTime);
+	
 
-	if (p->kp != 0) p->calculate(in, &pE);
-	if (i->ki != 0) i->calculate(pE, &iE);
-	if (d->kd != 0) d->calculate(pE, &dE);
+	int target = parameters.target;
+	double kp = parameters.kp;
+	double ki = parameters.ki;
+	double kd = parameters.kd;
 
-	(*out) = constrain(pE + iE + dE, lowest, highest);
-	Serial.println(*out);
+	int error = parameters.target - in;
+	int deltaError;
+
+	errorSum += error * deltaTime;
+	deltaError = (error - lastError) / deltaTime;
+
+	(*out) = -constrain(kp * error + ki * errorSum + kd * deltaError, 
+			lowest, highest);
+
+	lastError = error;
+	lastTime = now;
 }

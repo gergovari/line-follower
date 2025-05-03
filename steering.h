@@ -1,6 +1,7 @@
 #pragma once
 
 #include "common.h"
+#include "motor_pair.h"
 #include "motor.h"
 
 class Steering {
@@ -12,7 +13,8 @@ class Steering {
 		signed int lowest = -1000;
 		signed int highest = 1000;
 
-		Steering(Motor *l, Motor *r);
+		Steering(MotorPair *motors) 
+			: left(motors->left), right(motors->right) {};
 
 		void setTarget(signed int t);
 		void stop();

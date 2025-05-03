@@ -61,11 +61,7 @@ void test_steering(Steering *steering) {
 
 void demo(LineFollower *follower) 
 {
-	auto left = follower->motors->left;
-	auto right = follower->motors->right;
 	auto steering = follower->steering;
 
-	//test_leds(led1, led2, led3, led4);
-	test_motors(left, right);
 	test_steering(steering);
 }

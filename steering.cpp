@@ -2,11 +2,6 @@
 
 #include <Arduino.h>
 
-Steering::Steering(Motor *l, Motor *r) {
-	left = l;
-	right = r;
-}
-
 void Steering::setTarget(signed int t) {
 	signed int l = 0;
 	signed int r = 0;
