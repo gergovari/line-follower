@@ -1,6 +1,5 @@
 #pragma once
 
-/* Pin configuration */
 /*#define LED_SIZE 4
 #define LED1 8
 #define LED2 9
@@ -20,3 +19,7 @@
 #define RFORW 3
 #define RBACK 2
 #define RSPEED 5
+
+#define LEFT 8
+#define RIGHT 9
+#define OK 10

@@ -285,9 +285,9 @@ void doubleRightClick() {
 	disp.show(screenManager.current);
 }
 
-ButtonConfig left(8, leftClick, nullptr, doubleLeftClick);
-ButtonConfig right(9, rightClick, nullptr, doubleRightClick);
-ButtonConfig ok(10, okClick, okHold);
+ButtonConfig left(LEFT, leftClick, nullptr, doubleLeftClick);
+ButtonConfig right(RIGHT, rightClick, nullptr, doubleRightClick);
+ButtonConfig ok(OK, okClick, okHold);
 ButtonConfig *btns[3] = { &left, &right, &ok };
 
 Input input(btns, 3);
