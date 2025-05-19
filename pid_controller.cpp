@@ -18,7 +18,7 @@ void PIDController::calculate(int in, int *out) {
 	errorSum += error * deltaTime;
 	deltaError = (error - lastError) / deltaTime;
 
-	(*out) = -constrain(kp * error + ki * errorSum + kd * deltaError, 
+	(*out) = constrain(kp * error + ki * errorSum + kd * deltaError, 
 			lowest, highest);
 
 	lastError = error;
