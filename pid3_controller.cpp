@@ -7,3 +7,9 @@ void PID3Controller::calculate(int in, int *out) {
 	controller.Compute();
 	(*out) = output;
 }
+
+void PID3Controller::reconfigure() {
+	controller = PID(&input, &output, &parameters.target, 
+			parameters.kp, parameters.ki, parameters.kd, 
+			DIRECT);
+}

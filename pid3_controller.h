@@ -31,4 +31,7 @@ class PID3Controller : public Controller {
 			};
 
 		void calculate(int in, int *out);
+
+		/* TODO: i don't like this interface but we're on a deadline. */
+		void reconfigure();
 };

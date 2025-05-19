@@ -18,4 +18,6 @@ void Configuration::apply(PID3Controller *pid) {
 	parameters->kp = p;
 	parameters->ki = i;
 	parameters->kd = d;
+
+	pid->reconfigure();
 }
