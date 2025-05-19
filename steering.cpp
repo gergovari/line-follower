@@ -8,17 +8,8 @@ void Steering::setTarget(signed int t) {
 
 	t = constrain(t, lowest, highest);
 	
-	if (t > 0) {
-		l = (signed int)(left->highest * ((float)t / highest));
-		r = 0;
-	} else if (t < 0) {
-		t = abs(t);
-		l = 0;
-		r = (signed int)(right->highest * ((float)t / highest));
-	} else {
-		l = left->highest;
-		r = right->highest;
-	}
+	l = left->highest + t;
+	r = right->highest - t;
 
 	left->setSpeed(l);
 	right->setSpeed(r);
