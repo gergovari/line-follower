@@ -1,6 +1,6 @@
 #pragma once
 
-#include "pid_controller.h"
+#include "pid3_controller.h"
 
 class Configuration {
 	public:
@@ -16,5 +16,5 @@ class Configuration {
 
 		void load();
 		void save();
-		void apply(PIDController *pid);
+		void apply(PID3Controller *pid);
 };

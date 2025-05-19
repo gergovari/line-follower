@@ -13,9 +13,7 @@
 #include "discreet_sensor_reader.h"
 #include "memory_sensor_reader.h"
 
-#include "bang_raw_controller.h"
-#include "bang_controller.h"
-#include "pid_controller.h"
+#include "pid3_controller.h"
 
 #include "motor.h"
 #include "steering.h"
@@ -57,13 +55,12 @@ SensorManager manager(sensors, SENSOR_SIZE);
 DiscreetSensorReader discreetReader(CUTOFF);
 MemorySensorReader reader(&discreetReader);
 
-PIDParameters parameters(TARGET, KP, KI, KD);
-PIDController controller(parameters);
+PID3Parameters parameters(TARGET, KP, KI, KD);
+PID3Controller controller(parameters);
 
 Motor leftMotor(LFORW, LBACK, LSPEED);
 Motor rightMotor(RFORW, RBACK, RSPEED);
 MotorPair motors(&leftMotor, &rightMotor);
-//MotorPair motors(&rightMotor, &leftMotor);
 
 Steering steering(&motors);
 

@@ -11,7 +11,7 @@ void Configuration::load() {
 // TODO: save to EEPROM
 void Configuration::save() {}
 
-void Configuration::apply(PIDController *pid) {
+void Configuration::apply(PID3Controller *pid) {
 	auto *parameters = &pid->parameters;
 
 	parameters->target = target;
